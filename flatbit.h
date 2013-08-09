@@ -1,12 +1,36 @@
+#include <stdio.h>
 
-typedef struct { int version; } Header;
+enum FileOpenMode {
+	FILE_CLOSED, FILE_OPEN_EXCLUSIVE
+};
 
-typedef struct	{ int key; } Key;
+typedef struct FileHeader {
+	int version;
+	} Header;
 
-typedef struct Data { int data; } Data;
+typedef struct	RecordKey {
+	int key;
+	} Key;
 
-typedef struct { Key key; Data data; } Record;
+typedef struct RecordData {
+	int data;
+	} Data;
 
-typedef struct { Key key; int index; } Index;
+typedef struct RecordEntry {
+	Key key;
+	Data data;
+	} Record;
 
-typedef struct Tables { int id; } Table;
+typedef struct IndexPair {
+	Key key; int index;
+	} Index;
+
+typedef struct TableData {
+	const char * id;
+	int records;
+	int open;
+	} Table;
+	
+typedef struct FileEntry {
+	FILE * handle;
+} File;

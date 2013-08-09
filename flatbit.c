@@ -1,31 +1,52 @@
 #include "flatbit.h"
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-int openTable(Table * table)
+Table * initTable(Table * table)
 {
-	return 0;
+    if(table && !table->open)
+    {    
+        FILE * db_file = fopen(table->id, "a+");
+
+        if (db_file)
+        {
+            table->open = FILE_OPEN_EXCLUSIVE;
+            
+        } else
+        {
+            printf("file open failed\n");           
+        }
+    }
+
+    return table;
 }
 
 int writeHeader(Table * table, Header * header)
 {
-	return 0;
+    
+    return 0;
 }
 
 int writeData(Table * table, Record * r)
 {
-	return 0;
+    return 0;
 }
 
 Index * getIndex(Table * table, Key * pk)
 {
-	return 0;
+    return 0;
 }
 
 Data * getData(Table * table, Index * index)
 {
-	return 0;
+    return 0;
 }
 
 int main()
 {
-	return 0;
+    Table t = { .id = (const char *)"db", .records = 0 };
+    initTable(&t);
+    printf("Records: %i\n", t.records);
+    return 0;
 }
