@@ -21,7 +21,7 @@ typedef struct {
 } Header;
 
 typedef struct {
-	int key;
+	int pk;
 } Key;
 
 typedef struct {

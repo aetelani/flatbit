@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <string.h>
 
 //!TODO multitable, multifile, abstract file & format
 // Init File actually, one table, one file for now.
@@ -20,7 +21,7 @@ FBStorage * createStorage()
 	return storage;
 }
 
-Container * makeContainer()
+Container * makeContainer(FBStorage * s)
 {
 	Container * container = NULL;
 	
@@ -28,6 +29,7 @@ Container * makeContainer()
 	{
 		container = (Container*) calloc(1, sizeof(Container));
 		container->mode = CONTAINER_STORE_IN_FILE;
+		container->storage = s;
 		container->records = 0; //!TODO count get recotd count
 	}
     return container;
@@ -46,36 +48,84 @@ int writeHeader(FBStorage * storage)
 
 int writeData(Container * container, Record * record)
 {
+	//!TODO more methods, now only Append
+	fseek(container->storage->handle, 0, SEEK_END);
 	fwrite(record, sizeof(Record), 1, container->storage->handle);
+	++container->records;
 	fflush(container->storage->handle);
     return 0;
 }
 
-Index * getIndex(Container * c, Key * pk)
+int keyCmp(Key * a, Key * b)
 {
-    return 0;
+	return a && b ? a->pk == b->pk : 0;
 }
 
-Data * getData(Container * c, Index * ind)
+Record * copyRecord(Record * r)
 {
-    return 0;
+	Record * record = malloc(sizeof(Record));
+	memcpy(record,r, sizeof(Record));
+	return record;
+}
+
+unsigned int getIndex(Container * container, Key * pk)
+{
+	fseek(container->storage->handle, sizeof(Header)+1, SEEK_SET);
+	int readBufferSize = 1;
+	Record rec; unsigned int index=0;
+	for (; index <= container->records; ++index)
+	{
+		int read = fread(&rec, sizeof(Record), readBufferSize, container->storage->handle);
+		
+		if (keyCmp(&rec.key, pk))
+		{
+			break;
+		}
+	}
+	
+	if (read)
+	{
+		printf("rec->pk:%u, index:%u\n", rec.key.pk, index);
+	}
+    return index;
+}
+
+Data getData(Container * container, Index * ind)
+{
+	Record rec = { .data = 0 };
+	int failed = fseek(container->storage->handle, sizeof(Record)*ind->index+sizeof(Header), SEEK_SET);
+	if (!failed)
+	{
+		int read = fread(&rec, sizeof(Record), 1, container->storage->handle);
+	}
+    return rec.data;
 }
 
 int main()
 {
 	FBStorage *s = createStorage();
 	writeHeader(s);
-	Container *t = NULL;
+	Container *c = NULL;
 	
 	if (s)
 	{
-		t = makeContainer();
+		c = makeContainer(s);
 	}
+
+	Key key = { .pk = 0 };
+	Data data = { .data = 1 };
+	Record rec = { .key = key, .data = data };
+
+	writeData(c, &rec);
+
+	int ind  = getIndex(c, &key);
 	
-	if (t)
-		printf("Records: %i\n", t->records);
-	else
+	if (c)
+	{
+		printf("Records: %i\n", c->records);
+		printf("Founded index: %i\n", ind);
+	} else
 		printf("Failed miserably\n");
-		
+				
     return 0;
 }
