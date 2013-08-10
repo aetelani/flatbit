@@ -20,11 +20,12 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 
 enum StorageOpenMode {
-	FILE_CLOSED, FILE_OPEN_EXCLUSIVE
+	FILE_CLOSED, FILE_OPEN_EXCLUSIVE, FILE_OPEN_SHARED,
+	FILE_OPEN_WAL, FILE_OPEN_DIRECT
 };
 
-enum ContainerbMode {
-	CONTAINER_STORE_IN_FILE
+enum ContainerMode {
+	CONTAINER_STORE_IN_FILE, CONTAINER_STORE_BUFFERED, CONTAINER_STORE_IN_MEMORY
 };
 
 typedef struct {

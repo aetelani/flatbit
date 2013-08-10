@@ -108,10 +108,10 @@ unsigned int getIndex(Container * container, Key * pk)
     return index;
 }
 
-Data getData(Container * container, Index * ind)
+Data getData(Container * container, unsigned int ind)
 {
 	Record rec = { .data = 0 };
-	int failed = fseek(container->storage->handle, sizeof(Record)*ind->index+sizeof(Header), SEEK_SET);
+	int failed = fseek(container->storage->handle, sizeof(Record)*(ind-1)+sizeof(Header), SEEK_SET);
 	if (!failed)
 	{
 		int read = fread(&rec, sizeof(Record), 1, container->storage->handle);
@@ -136,12 +136,14 @@ int main()
 
 	writeData(c, &rec);
 
-	int ind  = getIndex(c, &key);
+	unsigned int index  = getIndex(c, &key);
+	Data d = getData(c, index);
 	
 	if (c)
 	{
 		printf("Records: %i\n", c->records);
-		printf("Founded index: %i\n", ind);
+		printf("Founded index: %i\n", index);
+		printf("Data digged:%i", d.data);
 	} else
 		printf("Failed miserably\n");
 				
