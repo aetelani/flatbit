@@ -27,43 +27,55 @@ Container * makeContainer()
     if(!container)
 	{
 		container = (Container*) calloc(1, sizeof(Container));
-		container->open = FILE_OPEN_EXCLUSIVE;
+		container->mode = CONTAINER_STORE_IN_FILE;
 		container->records = 0; //!TODO count get recotd count
 	}
     return container;
 }
 
-int writeHeader(Container * table, Header * header)
+int writeHeader(FBStorage * storage)
 {
-    if (table && table->open)
+    //if (container)
     {
-		lseek((int) fbStorage->handle, (off_t) 0, SEEK_SET);
-		fwrite(header, sizeof(*header), 1, fbStorage->handle);
-		fflush(fbStorage->handle);
+		lseek((int) storage->handle, (off_t) 0, SEEK_SET);
+		fwrite(&fbHeader, sizeof(Header), 1, storage->handle);
+		fflush(storage->handle);
 	}
     return 0;
 }
 
-int writeData(Container * table, Record * r)
+int writeData(Container * container, Record * record)
+{
+	fwrite(record, sizeof(Record), 1, container->storage->handle);
+	fflush(container->storage->handle);
+    return 0;
+}
+
+Index * getIndex(Container * c, Key * pk)
 {
     return 0;
 }
 
-Index * getIndex(Container * table, Key * pk)
-{
-    return 0;
-}
-
-Data * getData(Container * table, Index * index)
+Data * getData(Container * c, Index * ind)
 {
     return 0;
 }
 
 int main()
 {
-    Container *t = NULL;
-    FBStorage *s = createStorage();
-    t = makeContainer();
-    printf("Records: %i\n", t->records);
+	FBStorage *s = createStorage();
+	writeHeader(s);
+	Container *t = NULL;
+	
+	if (s)
+	{
+		t = makeContainer();
+	}
+	
+	if (t)
+		printf("Records: %i\n", t->records);
+	else
+		printf("Failed miserably\n");
+		
     return 0;
 }
