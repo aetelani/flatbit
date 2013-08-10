@@ -31,6 +31,8 @@ typedef struct TableData {
 	int open;
 	} Table;
 	
-typedef struct FileEntry {
+typedef struct FileSystemEntry {
 	FILE * handle;
-} File;
+} FBFile;
+
+FBFile * fbFile;

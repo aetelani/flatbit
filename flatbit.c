@@ -1,15 +1,18 @@
 #include "flatbit.h"
+#include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
 
 Table * initTable(Table * table)
 {
+	fbFile = (FBFile*) calloc(1, sizeof(FBFile));
+	
     if(table && !table->open)
     {    
-        FILE * db_file = fopen(table->id, "a+");
+        fbFile->handle = fopen(table->id, "a+");
 
-        if (db_file)
+        if (fbFile->handle)
         {
             table->open = FILE_OPEN_EXCLUSIVE;
             
@@ -24,7 +27,12 @@ Table * initTable(Table * table)
 
 int writeHeader(Table * table, Header * header)
 {
-    
+    if (table && table->open)
+    {
+		lseek((int) fbFile->handle, (off_t) 0, SEEK_SET);
+		fwrite(header, sizeof(*header), 1, fbFile->handle);
+		fflush(fbFile->handle);
+	}
     return 0;
 }
 
