@@ -4,17 +4,24 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-Table * initTable(Table * table)
-{
-	fbFile = (FBFile*) calloc(1, sizeof(FBFile));
-	
-    if(table && !table->open)
-    {    
-        fbFile->handle = fopen(table->id, "a+");
+//!TODO multitable, multifile, abstract file & format
+// Init File actually, one table, one file for now.
 
-        if (fbFile->handle)
+FBStorage * initStorage()
+{
+	fbStorage = (FBStorage*) calloc(1, sizeof(FBStorage));
+	fbStorage->id = "db";
+	fbStorage->handle = fopen(fbStorage->id, "a+");
+	return fbStorage;
+}
+
+Container * initContainer(Container * container)
+{	
+    if(container && !container->open)
+    {          
+        if (fbStorage->handle)
         {
-            table->open = FILE_OPEN_EXCLUSIVE;
+            container->open = FILE_OPEN_EXCLUSIVE;
             
         } else
         {
@@ -22,39 +29,39 @@ Table * initTable(Table * table)
         }
     }
 
-    return table;
+    return container;
 }
 
-int writeHeader(Table * table, Header * header)
+int writeHeader(Container * table, Header * header)
 {
     if (table && table->open)
     {
-		lseek((int) fbFile->handle, (off_t) 0, SEEK_SET);
-		fwrite(header, sizeof(*header), 1, fbFile->handle);
-		fflush(fbFile->handle);
+		lseek((int) fbStorage->handle, (off_t) 0, SEEK_SET);
+		fwrite(header, sizeof(*header), 1, fbStorage->handle);
+		fflush(fbStorage->handle);
 	}
     return 0;
 }
 
-int writeData(Table * table, Record * r)
+int writeData(Container * table, Record * r)
 {
     return 0;
 }
 
-Index * getIndex(Table * table, Key * pk)
+Index * getIndex(Container * table, Key * pk)
 {
     return 0;
 }
 
-Data * getData(Table * table, Index * index)
+Data * getData(Container * table, Index * index)
 {
     return 0;
 }
 
 int main()
 {
-    Table t = { .id = (const char *)"db", .records = 0 };
-    initTable(&t);
-    printf("Records: %i\n", t.records);
+    Container *t = NULL;
+    initContainer(t);
+    printf("Records: %i\n", t->records);
     return 0;
 }

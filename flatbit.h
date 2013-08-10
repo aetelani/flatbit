@@ -25,14 +25,17 @@ typedef struct IndexPair {
 	Key key; int index;
 	} Index;
 
-typedef struct TableData {
-	const char * id;
+typedef struct ContainerData {
 	int records;
 	int open;
-	} Table;
+	} Container;
 	
-typedef struct FileSystemEntry {
-	FILE * handle;
-} FBFile;
+typedef struct Storage {
+	const char * id;
+	FILE * 	handle;
+	void (*setHandle) (FILE*);
+} FBStorage;
 
-FBFile * fbFile;
+void impFBSetHandle(FILE*h) {}
+
+FBStorage * fbStorage;
