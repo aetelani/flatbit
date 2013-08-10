@@ -1,4 +1,4 @@
 all: flatbit.c
-	clang -x c flatbit.c -I. -o flatbit
+	gcc -g flatbit.c -I. -o flatbit
 clean:
 	rm *.o *.gch flatbit db

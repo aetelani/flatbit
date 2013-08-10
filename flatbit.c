@@ -7,28 +7,29 @@
 //!TODO multitable, multifile, abstract file & format
 // Init File actually, one table, one file for now.
 
-FBStorage * initStorage()
+FBStorage * createStorage()
 {
-	fbStorage = (FBStorage*) calloc(1, sizeof(FBStorage));
-	fbStorage->id = "db";
-	fbStorage->handle = fopen(fbStorage->id, "a+");
-	return fbStorage;
+	FBStorage * storage = NULL;
+	
+	if (!storage)
+	{
+		storage = (FBStorage*) calloc(1, sizeof(FBStorage));
+		storage->id = "db";
+		storage->handle = fopen(storage->id, "a+");
+	}
+	return storage;
 }
 
-Container * initContainer(Container * container)
-{	
-    if(container && !container->open)
-    {          
-        if (fbStorage->handle)
-        {
-            container->open = FILE_OPEN_EXCLUSIVE;
-            
-        } else
-        {
-            printf("file open failed\n");           
-        }
-    }
-
+Container * makeContainer()
+{
+	Container * container = NULL;
+	
+    if(!container)
+	{
+		container = (Container*) calloc(1, sizeof(Container));
+		container->open = FILE_OPEN_EXCLUSIVE;
+		container->records = 0; //!TODO count get recotd count
+	}
     return container;
 }
 
@@ -61,7 +62,8 @@ Data * getData(Container * table, Index * index)
 int main()
 {
     Container *t = NULL;
-    initContainer(t);
+    FBStorage *s = createStorage();
+    t = makeContainer();
     printf("Records: %i\n", t->records);
     return 0;
 }
