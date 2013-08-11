@@ -76,7 +76,10 @@ int writeData(Container * container, Record * record)
 
 int keyCmp(Key * a, Key * b)
 {
-	return a && b ? a->pk == b->pk : 0;
+	printf("%i .. %i\n", a->pk, b->pk);
+	int ret = a && b ? a->pk == b->pk : 0;
+	printf("return value cmp:%i\n", ret);
+	return ret;
 }
 
 Record * copyRecord(Record * r)
@@ -87,23 +90,29 @@ Record * copyRecord(Record * r)
 }
 
 unsigned int getIndex(Container * container, Key * pk)
-{
-	fseek(container->storage->handle, sizeof(Header)+1, SEEK_SET);
+{	
 	int readBufferSize = 1;
-	Record rec; unsigned int index=0;
+	const int sizeOfRecord = sizeof(Record);
+	const int sizeOfHeader = sizeof(Header);
+	Record rec; unsigned int index=1;
+	printf("iterating records: %i\n", container->records);
 	for (; index <= container->records; ++index)
 	{
+		int seekTo = sizeOfHeader+sizeOfRecord*index;
+		fseek(container->storage->handle, seekTo, SEEK_SET);
+		printf("seekTo %i, ind:%i\n", seekTo, index);
 		int read = fread(&rec, sizeof(Record), readBufferSize, container->storage->handle);
 		
 		if (keyCmp(&rec.key, pk))
 		{
+			printf("found pk match\n");
 			break;
 		}
 	}
 	
 	if (read)
 	{
-		printf("rec->pk:%u, index:%u\n", rec.key.pk, index);
+		printf("rec->pk:%u, index:%u\n", pk->pk, index);
 	}
     return index;
 }
@@ -130,20 +139,27 @@ int main()
 		c = makeContainer(s);
 	}
 
-	Key key = { .pk = 0 };
-	Data data = { .data = 1 };
-	Record rec = { .key = key, .data = data };
+	int recordCnt = 10;
+	for (int i=0; i < recordCnt; i++)
+	{
+		Key key = { .pk = i };
+		Data data = { .data = i };
+		Record rec = { .key = key, .data = data };
+		writeData(c, &rec);
+	}
 
-	writeData(c, &rec);
-
-	unsigned int index  = getIndex(c, &key);
-	Data d = getData(c, index);
+	for (int i=0; i < recordCnt; i++)
+	{
+		Key key = { .pk = i };
+		unsigned int index  = getIndex(c, &key);
+		Data d = getData(c, index);
+	}
 	
 	if (c)
 	{
-		printf("Records: %i\n", c->records);
+		/*printf("Records: %i\n", c->records);
 		printf("Founded index: %i\n", index);
-		printf("Data digged:%i", d.data);
+		printf("Data digged:%i", d.data);*/
 	} else
 		printf("Failed miserably\n");
 				
