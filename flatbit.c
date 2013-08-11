@@ -148,7 +148,7 @@ int main()
 		writeData(c, &rec);
 	}
 
-	for (int i=; i < recordCnt; i++)
+	for (int i=0; i < recordCnt; i++)
 	{
 		Key key = { .pk = i };
 		unsigned int index  = getIndex(c, &key);
