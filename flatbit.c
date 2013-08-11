@@ -94,7 +94,7 @@ unsigned int getIndex(Container * container, Key * pk)
 	int readBufferSize = 1;
 	const int sizeOfRecord = sizeof(Record);
 	const int sizeOfHeader = sizeof(Header);
-	Record rec; unsigned int index=1;
+	Record rec; unsigned int index=0;
 	printf("iterating records: %i\n", container->records);
 	for (; index <= container->records; ++index)
 	{
@@ -120,7 +120,7 @@ unsigned int getIndex(Container * container, Key * pk)
 Data getData(Container * container, unsigned int ind)
 {
 	Record rec = { .data = 0 };
-	int failed = fseek(container->storage->handle, sizeof(Record)*(ind-1)+sizeof(Header), SEEK_SET);
+	int failed = fseek(container->storage->handle, sizeof(Record)*(ind)+sizeof(Header), SEEK_SET);
 	if (!failed)
 	{
 		int read = fread(&rec, sizeof(Record), 1, container->storage->handle);
@@ -148,7 +148,7 @@ int main()
 		writeData(c, &rec);
 	}
 
-	for (int i=0; i < recordCnt; i++)
+	for (int i=; i < recordCnt; i++)
 	{
 		Key key = { .pk = i };
 		unsigned int index  = getIndex(c, &key);
