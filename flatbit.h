@@ -17,54 +17,17 @@ You should have received a copy of the GNU General Public License
 along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
+#ifndef FLATBIT_H
+#define FLATBIT_H
+
+//#include <stdio.h>
 
 enum StorageOpenMode {
 	FILE_CLOSED, FILE_OPEN_EXCLUSIVE, FILE_OPEN_SHARED,
 	FILE_OPEN_WAL, FILE_OPEN_DIRECT
 };
 
-enum ContainerMode {
-	CONTAINER_STORE_IN_FILE, CONTAINER_STORE_BUFFERED, CONTAINER_STORE_IN_MEMORY
-};
 
-typedef struct {
-	const char * id;
-	FILE * 	handle;
-	void (*setHandle) (FILE*);
-} FBStorage;
+//void impFBSetHandle(FILE*h) {}
 
-FBStorage * fbStorage;
-
-typedef struct {
-	int version;
-} Header;
-
-typedef struct {
-	int pk;
-} Key;
-
-typedef struct {
-	int data;
-} Data;
-
-typedef struct {
-	Key key;
-	Data data;
-} Record;
-
-typedef struct {
-	Key key;
-	int index;
-} Index;
-
-typedef struct {
-	int records;
-	int mode;
-	Index *index;
-	FBStorage * storage;
-} Container;
-
-void impFBSetHandle(FILE*h) {}
-
-Header fbHeader = { .version = 1 };
+#endif
