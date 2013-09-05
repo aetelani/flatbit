@@ -26,7 +26,9 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 
 int main()
 {
-    FBStorage *s = createStorage();
+//	FBStorage *s = openStorage();
+	
+/*    FBStorage *s = createStorage();
     writeHeader(s);
     Container *c = NULL;
     
@@ -53,11 +55,11 @@ int main()
     
     if (c)
     {
-        /*printf("Records: %i\n", c->records);
-        printf("Founded index: %i\n", index);
-        printf("Data digged:%i", d.data);*/
+        //printf("Records: %i\n", c->records);
+        //printf("Founded index: %i\n", index);
+        //printf("Data digged:%i", d.data);
     } else
         printf("Failed miserably\n");
-                
+ */              
     return 0;
 }

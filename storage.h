@@ -36,9 +36,13 @@ typedef struct
 
 FBStorage * fbStorage;
 
-FBStorage * createStorage();
+FBStorage * openStorage();
+
+int closeStorage(FBStorage * storage);
 
 int writeHeader(FBStorage * storage);
+
+int removeStorage(FBStorage * storage);
 
 typedef struct {
 	int version;
