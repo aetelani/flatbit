@@ -26,9 +26,9 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 
 int main()
 {
-//	FBStorage *s = openStorage();
+	FBStorage *s = openStorage();
 	
-/*    FBStorage *s = createStorage();
+//    FBStorage *s = createStorage();
     writeHeader(s);
     Container *c = NULL;
     
@@ -60,6 +60,6 @@ int main()
         //printf("Data digged:%i", d.data);
     } else
         printf("Failed miserably\n");
- */              
+
     return 0;
 }
