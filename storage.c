@@ -7,7 +7,6 @@ int writeHeader(FBStorage * storage);
 FBStorage * openStorage()
 {
     FBStorage * storage = calloc(1, sizeof(FBStorage));
-    int cleanStorage = 0;
 
     if (storage)
     {
@@ -19,8 +18,14 @@ FBStorage * openStorage()
 
     if (fileRWFailed)
     {
-        cleanStorage = !removeStorage(storage);
-        storage->status = STORAGE_REMOVED;
+        int storageRemoveFailed = removeStorage(storage);
+        
+        if (storageRemoveFailed)
+        {
+            printf("storage remove failed, freeing handle");
+            if (storage && storage->handle)
+                free(storage->handle);
+        }
     }
     
     storage->handle = fopen(storage->id, "a+");

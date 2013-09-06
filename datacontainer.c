@@ -78,7 +78,9 @@ unsigned int getIndex(Container * container, Key * pk)
 Data getData(Container * container, unsigned int ind)
 {
     Record rec = { .data = 0 };
+    
     int failed = fseek(container->storage->handle, sizeof(Record)*(ind)+sizeof(Header), SEEK_SET);
+    
     if (!failed)
     {
         int read = fread(&rec, sizeof(Record), 1, container->storage->handle);
