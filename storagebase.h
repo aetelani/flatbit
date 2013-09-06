@@ -16,11 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-typedef enum
-{
-	STORAGE_FILE_APPEND
-} StorageFileType;
+#ifndef STORAGEBASE_H
+#define STORAGEBASE_H
 
 typedef struct StorageBase
 {
@@ -29,3 +26,5 @@ typedef struct StorageBase
     int id;
     void * handle;
 } FBStorageBase;
+
+#endif

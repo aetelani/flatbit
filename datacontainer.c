@@ -27,20 +27,19 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 Container * makeContainer(StoragePolicy policy)
 {
     Container * container = calloc(1, sizeof(Container));
-    container->records = 0; //!TODO count get recotd count
+    container->records = 0; //!TODO count get record count
     container->mode = policy;
+	FBStorageBase *storageBase = calloc(1, sizeof(FBStorageBase));
     
     switch (container->mode)
     {
 		case CONTAINER_STORE_IN_FILE:
 		{
-			printf("CONTAINER_STORE_IN_FILE\n");
-			FBStorageBase *sb = calloc(1, sizeof(FBStorageBase));
-			sb->handle = openStorage()->handle; //fix return type
-			printf("sb->handle: %p\n", sb->handle);
-			sb->mode = STORAGE_FILE_APPEND; //! TODO file mode
-			sb->type = CONTAINER_STORE_IN_FILE;
-			container->storage = sb;
+			printf("CONTAINER_STORE_IN_FILE\n");			
+			storageBase->handle = openStorage()->handle; //fix return type
+			storageBase->mode = STORAGE_APPEND;
+			storageBase->type = CONTAINER_STORE_IN_FILE;
+			container->storage = storageBase;
 			break;
 		}
 		case CONTAINER_STORE_BUFFERED:
@@ -51,10 +50,15 @@ Container * makeContainer(StoragePolicy policy)
 		case CONTAINER_STORE_IN_MEMORY:
 		{
 			printf("CONTAINER_STORE_IN_MEMORY\n");
+			storageBase->handle = calloc(1, sizeof(Header));
+			storageBase->mode = STORAGE_APPEND;
+			storageBase->type = CONTAINER_STORE_IN_MEMORY;
+			container->storage = storageBase;			
 			break;
 		}
 		default:
 			printf("policy not found\n");
+			free(storageBase);
 			free(container);
 	}
 
@@ -65,10 +69,10 @@ int writeData(Container * container, Record * record)
 {
     //!TODO more methods, now only Append
     printf("sb->handle: %p\n", container->storage->handle);
-    fseek(container->storage->handle, 0, SEEK_END);
+    /*fseek(container->storage->handle, 0, SEEK_END);
     fwrite(record, sizeof(Record), 1, container->storage->handle);
     ++container->records;
-    fflush(container->storage->handle);
+    fflush(container->storage->handle);*/
     return 0;
 }
 

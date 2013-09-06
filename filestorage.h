@@ -19,10 +19,12 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef FILESTORAGE_H
 #define FILESTORAGE_H
 #include <stdio.h>
-#include <storage.h>
+#include <storagebase.h>
+#include <datacontainer.h>
 
-int storage_open(StorageBase *);
+int fileStorageOpen(FBStorageBase *);
 
-int storage_close(StorageBase *);
+int fileStorageClose(FBStorageBase *);
 
+int fileWriteData(Container * storage, Record * record);
 #endif

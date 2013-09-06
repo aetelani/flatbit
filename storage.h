@@ -25,6 +25,11 @@ typedef enum {
     STORAGE_UNDEF=-1, STORAGE_OPEN=0, STORAGE_CLOSED, STORAGE_REMOVED
 } StorageStatus;
 
+typedef enum
+{
+	STORAGE_APPEND
+} StorageMode;
+
 typedef struct {
 	const char * id;
 	FILE * 	handle;

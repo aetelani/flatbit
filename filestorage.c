@@ -1,8 +1,14 @@
+#include <filestorage.h>
 
-int storage_open(StorageBase * storage)
+int fileStorageOpen(FBStorageBase * storage)
 {
+	return 0;
 }
 
-int storage_close(StorageBase * storage)
+int fileStorageClose(FBStorageBase * storage)
 {
+	return 0;
 }
+
+int fileWriteData(Container * storage, Record * record)
+ {return 0;}

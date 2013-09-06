@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 project (flatbit)
-add_executable(flatbit flatbit.c datacontainer.c storage.c storagepolicy.c)
+add_executable(flatbit flatbit.c datacontainer.c storage.c storagepolicy.c filestorage.c)
 include_directories (${flatbit_SOURCE_DIR}) 
 
 SET (CMAKE_C_COMPILER             "/usr/bin/clang")
