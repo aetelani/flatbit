@@ -35,7 +35,12 @@ Container * makeContainer(StoragePolicy policy)
 		case CONTAINER_STORE_IN_FILE:
 		{
 			printf("CONTAINER_STORE_IN_FILE\n");
-			container->storage = openStorage();
+			FBStorageBase *sb = calloc(1, sizeof(FBStorageBase));
+			sb->handle = openStorage()->handle; //fix return type
+			printf("sb->handle: %p\n", sb->handle);
+			sb->mode = STORAGE_FILE_APPEND; //! TODO file mode
+			sb->type = CONTAINER_STORE_IN_FILE;
+			container->storage = sb;
 			break;
 		}
 		case CONTAINER_STORE_BUFFERED:
@@ -59,6 +64,7 @@ Container * makeContainer(StoragePolicy policy)
 int writeData(Container * container, Record * record)
 {
     //!TODO more methods, now only Append
+    printf("sb->handle: %p\n", container->storage->handle);
     fseek(container->storage->handle, 0, SEEK_END);
     fwrite(record, sizeof(Record), 1, container->storage->handle);
     ++container->records;

@@ -20,6 +20,7 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #define DATACONTAINER_H
 #include <storage.h>
 #include <storagepolicy.h>
+#include <storagebase.h>
 
 typedef struct DataKey {
 	int pk;
@@ -43,7 +44,7 @@ typedef struct {
 	int records;
 	int mode;
 	Index *index;
-	FBStorage * storage;
+	FBStorageBase * storage;
 } Container;
 
 Container * makeContainer(StoragePolicy s);

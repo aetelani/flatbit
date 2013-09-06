@@ -32,13 +32,6 @@ typedef struct {
     StorageStatus status;
 } FBStorage;
 
-typedef struct
-{
-    int type;
-    int mode;
-    int id;
-} StorageBase;
-
 FBStorage * fbStorage;
 
 FBStorage * openStorage();
