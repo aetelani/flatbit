@@ -26,16 +26,15 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 
 int main()
 {
-	FBStorage *s = openStorage();
+//	FBStorage *s = openStorage();
+	
+	StoragePolicy storagePolicy = CONTAINER_STORE_IN_FILE;
 	
 //    FBStorage *s = createStorage();
-    writeHeader(s);
+
     Container *c = NULL;
     
-    if (s)
-    {
-        c = makeContainer(s);
-    }
+	c = makeContainer(storagePolicy);
 
     int recordCnt = 10;
     for (int i=0; i < recordCnt; i++)

@@ -19,16 +19,13 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef DATACONTAINER_H
 #define DATACONTAINER_H
 #include <storage.h>
+#include <storagepolicy.h>
 
-enum ContainerMode {
-	CONTAINER_STORE_IN_FILE, CONTAINER_STORE_BUFFERED, CONTAINER_STORE_IN_MEMORY
-};
-
-typedef struct {
+typedef struct DataKey {
 	int pk;
 } Key;
 
-typedef struct {
+typedef struct DataLoad {
 	int data;
 } Data;
 
@@ -49,7 +46,7 @@ typedef struct {
 	FBStorage * storage;
 } Container;
 
-Container * makeContainer(FBStorage * s);
+Container * makeContainer(StoragePolicy s);
 
 int writeData(Container * container, Record * record);
 

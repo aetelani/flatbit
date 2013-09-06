@@ -1,21 +1,39 @@
 #include <datacontainer.h>
+#include <storagepolicy.h>
 #include <storage.h>
 #include <flatbit.h>
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
 
-Container * makeContainer(FBStorage * s)
+Container * makeContainer(StoragePolicy policy)
 {
-    Container * container = NULL;
+    Container * container = calloc(1, sizeof(Container));
+    container->records = 0; //!TODO count get recotd count
+    container->mode = policy;
     
-    if(!container)
+    switch (container->mode)
     {
-        container = calloc(1, sizeof(Container));
-        container->mode = CONTAINER_STORE_IN_FILE;
-        container->storage = s;
-        container->records = 0; //!TODO count get recotd count
-    }
+		case CONTAINER_STORE_IN_FILE:
+		{
+			printf("CONTAINER_STORE_IN_FILE\n");
+			container->storage = openStorage();
+			break;
+		}
+		case CONTAINER_STORE_BUFFERED:
+		{
+			printf("CONTAINER_STORE_BUFFERED\n");
+			break;
+		}
+		case CONTAINER_STORE_IN_MEMORY:
+		{
+			printf("CONTAINER_STORE_IN_MEMORY\n");
+			break;
+		}
+		default:
+			printf("policy not found\n");
+			free(container);
+	}
 
     return container;
 }
