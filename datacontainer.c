@@ -25,23 +25,25 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <malloc.h>
 #include <string.h>
 
-Container * makeContainer(StoragePolicy policy)
+struct Container * makeContainer(StoragePolicy policy)
 {
-    Container * container = calloc(1, sizeof(Container));
+    struct Container * container = calloc(1, sizeof(struct Container));
     container->records = 0; //!TODO count get record count
     container->mode = policy;
-	FBStorage *storage = calloc(1, sizeof(FBStorage));
+    
+    if (!container->storage) 
+		container->storage = calloc(1, sizeof(FBStorage));
     
     switch (container->mode)
     {
 		case CONTAINER_STORE_IN_FILE:
 		{
 			printf("CONTAINER_STORE_IN_FILE\n");			
-			storage->base = calloc(1, sizeof(struct StorageBase));
-			storage->base->handle = openStorage()->handle; //fix return type
-			storage->mode = STORAGE_APPEND;
-			storage->type = CONTAINER_STORE_IN_FILE;
-			container->storage = storage;
+			container->storage->base =	fileStorageInit();
+			assert(container && container->storage && container->storage->base && container->storage->base->open);
+			int failed = container->storage->base->open(container); //little long path, maybe container ctx would be ok
+			container->storage->mode = STORAGE_APPEND;
+			container->storage->type = CONTAINER_STORE_IN_FILE;
 			break;
 		}
 		case CONTAINER_STORE_BUFFERED:
@@ -60,14 +62,14 @@ Container * makeContainer(StoragePolicy policy)
 		}
 		default:
 			printf("policy not found\n");
-			free(storage);
+			free(container->storage);
 			free(container);
 	}
 
     return container;
 }
 
-int writeData(Container * container, Record * record)
+int writeData(struct Container * container, struct Record * record)
 {
     //!TODO more methods, now only Append
     printf("sb->handle: %p\n", container->storage->handle);
@@ -86,28 +88,28 @@ int keyCmp(Key * a, Key * b)
     return ret;
 }
 
-Record * copyRecord(Record * r)
+struct Record * copyRecord(struct Record * r)
 {
-    Record * record = malloc(sizeof(Record));
-    memcpy(record,r, sizeof(Record));
+    struct Record * record = malloc(sizeof(struct Record));
+    memcpy(record,r, sizeof(struct Record));
     return record;
 }
 
-unsigned int getIndex(Container * container, Key * pk)
+unsigned int getIndex(struct Container * container, Key * pk)
 {   
     int readBufferSize = 1;
-    const int sizeOfRecord = sizeof(Record);
-    const int sizeOfHeader = sizeof(Header);
-    Record rec; unsigned int index=0;
+    const int sizeOfRecord = sizeof(struct Record);
+    const int sizeOfHeader = sizeof(struct Header);
+    struct Record rec; unsigned int index=0;
     int readedValue;
 
     printf("iterating records: %i\n", container->records);
-    for (; index <= container->records; ++index)
+    for (; index < container->records; ++index)
     {
         int seekTo = sizeOfHeader+sizeOfRecord*index;
         fseek(container->storage->base->handle, seekTo, SEEK_SET);
         printf("seekTo %i, ind:%i\n", seekTo, index);
-        readedValue = fread(&rec, sizeof(Record), readBufferSize, container->storage->base->handle);
+        readedValue = fread(&rec, sizeof(struct Record), readBufferSize, container->storage->base->handle);
         
         if (keyCmp(&rec.key, pk))
 		{
@@ -123,15 +125,17 @@ unsigned int getIndex(Container * container, Key * pk)
     return index;
 }
 
-Data getData(Container * container, unsigned int ind)
+Data getData(struct Container * container, unsigned int ind)
 {
-    Record rec = { .data = 0 };
+    struct Record rec = { .data = 0 };
+    int failed = 1;
     
-    int failed = fseek(container->storage->base->handle, sizeof(Record)*(ind)+sizeof(Header), SEEK_SET);
+    assert(container && container->storage && container->storage->base && container->storage->base->handle);
+	failed = fseek(container->storage->base->handle, sizeof(struct Record)*(ind)+sizeof(struct Header), SEEK_SET);
     
     if (!failed)
     {
-        int read = fread(&rec, sizeof(Record), 1, container->storage->base->handle);
+        int read = fread(&rec, sizeof(struct Record), 1, container->storage->base->handle);
     }
     return rec.data;
 }

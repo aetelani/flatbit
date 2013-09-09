@@ -21,6 +21,7 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #define FLATBIT_H
 
 //#include <stdio.h>
+#include <assert.h>
 
 enum StorageOpenMode {
 	FILE_CLOSED, FILE_OPEN_EXCLUSIVE, FILE_OPEN_SHARED,

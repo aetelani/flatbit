@@ -17,14 +17,3 @@ You should have received a copy of the GNU General Public License
 along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <storagebase.h>
-
-int fileStorageInit()
-{
-	fileStorage.open = &fleOpen;
-	return 0;
-}
-
-int fileStorageOpen(Container *c)
-{
-	return 0;
-};

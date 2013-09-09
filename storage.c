@@ -19,8 +19,21 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <storage.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <filestorage.h>
+#include <storagebase.h>
 
-int writeHeader(FBStorage * storage);
+struct StorageBase * fileStorageInit()
+{	
+	struct StorageBase * base = calloc(1, sizeof(struct StorageBase));
+	base->open = &fileStorageOpen; // should be policy based, not probably explicit
+	base->close = &fileStorageClose;
+	base->write = &fileWriteRecord;
+	base->read = &fileReadRecord; 
+	printf("pointer to fileStorage.open: %p\n", base->open);
+	return base;
+}
+
+/*int writeHeader(FBStorage * storage);
 
 FBStorage * openStorage()
 {
@@ -92,8 +105,8 @@ int writeHeader(FBStorage * storage)
     if (storage && storage->status == STORAGE_OPEN)
     {
         lseek((int) storage->handle, (off_t) 0, SEEK_SET);
-        fwrite(&fbHeader, sizeof(Header), 1, storage->handle);
+        fwrite(&fbHeader, sizeof(struct Header), 1, storage->handle);
         fflush(storage->handle);
     }
     return 0;
-}
+}*/

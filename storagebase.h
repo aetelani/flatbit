@@ -26,15 +26,12 @@ struct StorageBase
 {
     StorageHandle * handle;
 	struct Header * header;
-    int (*write)(Container *container, Record *record);
-    Data * (*read)(Container *container, unsigned int index);
-    int (*open)(Container *container);
-    int (*close)(Container *container);
+    int (*write)(struct Container *container, struct Record *record);
+    int (*read)(struct Container *container, struct Record * recordOut, unsigned int index);
+    int (*open)(struct Container *container);
+    int (*close)(struct Container *container);
 };
-struct StorageBase fileStorage;
 
-int fileStorageOpen(Container *c);
-
-int fileStorageInit();
+static struct StorageBase fileStorage;
 
 #endif

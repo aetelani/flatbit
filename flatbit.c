@@ -28,7 +28,7 @@ int main()
 {
 	StoragePolicy storagePolicy = CONTAINER_STORE_IN_FILE;
 	
-    Container *c = NULL;
+    struct Container *c = NULL;
     
 	c = makeContainer(storagePolicy);
 
@@ -37,8 +37,8 @@ int main()
     {
         Key key = { .pk = i };
         Data data = { .data = i };
-        Record rec = { .key = key, .data = data };
-        writeData(c, &rec);
+        struct Record rec = { .key = key, .data = data };
+//        writeData(c, &rec);
     }
 
     for (int i=0; i < recordCnt; i++)

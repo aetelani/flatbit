@@ -21,6 +21,8 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <storage.h>
 #include <storagepolicy.h>
 
+struct StorageBase;
+
 typedef struct DataKey {
 	int pk;
 } Key;
@@ -29,34 +31,34 @@ typedef struct DataLoad {
 	int data;
 } Data;
 
-typedef struct {
+struct Record {
 	Key key;
 	Data data;
-} Record;
+};
 
 typedef struct {
 	Key key;
 	int index;
 } Index;
 
-typedef struct {
+struct Container {
 	int records;
 	int mode;
 	Index *index;
-	FBStorage * storage; 
+	FBStorage * storage;
 	//change this to FBStorage and use storagebase for generic api for operations that use file apia tai mitä sitten tarviikaan.!!!!
-} Container;
+};
 
-Container * makeContainer(StoragePolicy s);
+struct Container * makeContainer(StoragePolicy s);
 
 int keyCmp(Key * a, Key * b);
 
-int writeData(Container * container, Record * record);
+int writeData(struct Container * container, struct Record * record);
 
-Record * copyRecord(Record * r);
+struct Record * copyRecord(struct Record * r);
 
-unsigned int getIndex(Container * container, Key * pk);
+unsigned int getIndex(struct Container * container, Key * pk);
 
-Data getData(Container * container, unsigned int ind);
+Data getData(struct Container * container, unsigned int ind);
 
 #endif

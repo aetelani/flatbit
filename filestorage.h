@@ -19,17 +19,24 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef FILESTORAGE_H
 #define FILESTORAGE_H
 #include <stdio.h>
-#include <storagebase.h>
-#include <datacontainer.h>
 
-typedef struct FileStorage
+struct Container;
+struct Record;
+
+struct FileStorage
 {
-		int i;
-} FBFileStorage;
+	char * id;
+}; //probably could use this instead of Container
 
-int fileStorageOpen(Container *);
+typedef struct FileStorage FBFileStorage;
 
-int fileStorageClose(Container *);
+int fileStorageOpen(struct Container *);
 
-int fileWriteData(Container * storage, Record * record);
+int fileStorageClose(struct Container *);
+
+int fileReadRecord(struct Container *container, struct Record * recordOut, unsigned int index);
+
+int fileWriteRecord(struct Container * container, struct Record * record);
+
+int fileWriteHeader(struct Container * container);
 #endif
