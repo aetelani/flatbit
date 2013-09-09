@@ -1,11 +1,11 @@
 #include <filestorage.h>
 
-int fileStorageOpen(FBStorageBase * storage)
+int fileStorageOpen(FBFileStorage * storage)
 {
 	return 0;
 }
 
-int fileStorageClose(FBStorageBase * storage)
+int fileStorageClose(FBFileStorage * storage)
 {
 	return 0;
 }

@@ -18,13 +18,14 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 */
 #ifndef STORAGEBASE_H
 #define STORAGEBASE_H
+#include <datacontainer.h>
 
-typedef struct StorageBase
+struct StorageBase
 {
-    int type;
-    int mode;
-    int id;
     void * handle;
-} FBStorageBase;
+    int (*write)(Container *container, Record *record);
+    Data * (*read)(Container *container, unsigned int index);
+};
+typedef struct StorageBase FBStorageBase;
 
 #endif

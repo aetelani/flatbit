@@ -23,18 +23,22 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef enum {
     STORAGE_UNDEF=-1, STORAGE_OPEN=0, STORAGE_CLOSED, STORAGE_REMOVED
-} StorageStatus;
+} FBStorageStatus;
 
 typedef enum
 {
 	STORAGE_APPEND
 } StorageMode;
 
+struct StorageBase;
 typedef struct {
 	const char * id;
+    int type;
+    int mode;
 	FILE * 	handle;
 	void (*setHandle) (FILE*);
-    StorageStatus status;
+	struct StorageBase * base;
+    FBStorageStatus status;
 } FBStorage;
 
 FBStorage * fbStorage;

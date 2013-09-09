@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <datacontainer.h>
+#include <storagebase.h>
 #include <storagepolicy.h>
 #include <storage.h>
 #include <flatbit.h>
@@ -29,17 +30,18 @@ Container * makeContainer(StoragePolicy policy)
     Container * container = calloc(1, sizeof(Container));
     container->records = 0; //!TODO count get record count
     container->mode = policy;
-	FBStorageBase *storageBase = calloc(1, sizeof(FBStorageBase));
+	FBStorage *storage = calloc(1, sizeof(FBStorage));
     
     switch (container->mode)
     {
 		case CONTAINER_STORE_IN_FILE:
 		{
 			printf("CONTAINER_STORE_IN_FILE\n");			
-			storageBase->handle = openStorage()->handle; //fix return type
-			storageBase->mode = STORAGE_APPEND;
-			storageBase->type = CONTAINER_STORE_IN_FILE;
-			container->storage = storageBase;
+			storage->base = calloc(1, sizeof(FBStorageBase));
+			storage->base->handle = openStorage()->handle; //fix return type
+			storage->mode = STORAGE_APPEND;
+			storage->type = CONTAINER_STORE_IN_FILE;
+			container->storage = storage;
 			break;
 		}
 		case CONTAINER_STORE_BUFFERED:
@@ -50,15 +52,15 @@ Container * makeContainer(StoragePolicy policy)
 		case CONTAINER_STORE_IN_MEMORY:
 		{
 			printf("CONTAINER_STORE_IN_MEMORY\n");
-			storageBase->handle = calloc(1, sizeof(Header));
+			/*storageBase->handle = calloc(1, sizeof(Header));
 			storageBase->mode = STORAGE_APPEND;
 			storageBase->type = CONTAINER_STORE_IN_MEMORY;
-			container->storage = storageBase;			
+			container->storage = storageBase;*/
 			break;
 		}
 		default:
 			printf("policy not found\n");
-			free(storageBase);
+			free(storage);
 			free(container);
 	}
 
@@ -103,9 +105,9 @@ unsigned int getIndex(Container * container, Key * pk)
     for (; index <= container->records; ++index)
     {
         int seekTo = sizeOfHeader+sizeOfRecord*index;
-        fseek(container->storage->handle, seekTo, SEEK_SET);
+        fseek(container->storage->base->handle, seekTo, SEEK_SET);
         printf("seekTo %i, ind:%i\n", seekTo, index);
-        readedValue = fread(&rec, sizeof(Record), readBufferSize, container->storage->handle);
+        readedValue = fread(&rec, sizeof(Record), readBufferSize, container->storage->base->handle);
         
         if (keyCmp(&rec.key, pk))
 		{
@@ -125,11 +127,11 @@ Data getData(Container * container, unsigned int ind)
 {
     Record rec = { .data = 0 };
     
-    int failed = fseek(container->storage->handle, sizeof(Record)*(ind)+sizeof(Header), SEEK_SET);
+    int failed = fseek(container->storage->base->handle, sizeof(Record)*(ind)+sizeof(Header), SEEK_SET);
     
     if (!failed)
     {
-        int read = fread(&rec, sizeof(Record), 1, container->storage->handle);
+        int read = fread(&rec, sizeof(Record), 1, container->storage->base->handle);
     }
     return rec.data;
 }
