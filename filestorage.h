@@ -22,14 +22,14 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <storagebase.h>
 #include <datacontainer.h>
 
-typedef struct
+typedef struct FileStorage
 {
 		int i;
 } FBFileStorage;
 
-int fileStorageOpen(FBFileStorage *);
+int fileStorageOpen(Container *);
 
-int fileStorageClose(FBFileStorage *);
+int fileStorageClose(Container *);
 
 int fileWriteData(Container * storage, Record * record);
 #endif

@@ -20,12 +20,21 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #define STORAGEBASE_H
 #include <datacontainer.h>
 
+struct Header;
+typedef void StorageHandle;
 struct StorageBase
 {
-    void * handle;
+    StorageHandle * handle;
+	struct Header * header;
     int (*write)(Container *container, Record *record);
     Data * (*read)(Container *container, unsigned int index);
+    int (*open)(Container *container);
+    int (*close)(Container *container);
 };
-typedef struct StorageBase FBStorageBase;
+struct StorageBase fileStorage;
+
+int fileStorageOpen(Container *c);
+
+int fileStorageInit();
 
 #endif

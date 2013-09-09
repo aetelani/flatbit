@@ -1,14 +1,16 @@
 #include <filestorage.h>
 
-int fileStorageOpen(FBFileStorage * storage)
+int fileStorageOpen(Container * storage)
 {
 	return 0;
 }
 
-int fileStorageClose(FBFileStorage * storage)
+int fileStorageClose(Container * storage)
 {
 	return 0;
 }
 
 int fileWriteData(Container * storage, Record * record)
- {return 0;}
+{
+	return 0;
+}

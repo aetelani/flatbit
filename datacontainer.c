@@ -37,7 +37,7 @@ Container * makeContainer(StoragePolicy policy)
 		case CONTAINER_STORE_IN_FILE:
 		{
 			printf("CONTAINER_STORE_IN_FILE\n");			
-			storage->base = calloc(1, sizeof(FBStorageBase));
+			storage->base = calloc(1, sizeof(struct StorageBase));
 			storage->base->handle = openStorage()->handle; //fix return type
 			storage->mode = STORAGE_APPEND;
 			storage->type = CONTAINER_STORE_IN_FILE;
