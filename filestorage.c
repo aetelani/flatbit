@@ -140,15 +140,21 @@ int fileRemoveStorage(struct Container * container)
 
 int fileWriteHeader(struct Container * container)
 {
-	assert(container && container->storage && container->storage->handle);	
+	assert(container && container->storage && container->storage->handle);
+	struct Header * header = makeHeader(container);
 	
-	if (container->storage->status == STORAGE_OPEN)
-	{
-		struct Header * header = makeHeader(container);
-        lseek((int) container->storage->handle, (off_t) 0, SEEK_SET);
-        fwrite(header, sizeof(struct Header), 1, container->storage->handle);
-        fflush(container->storage->handle);
-        free(header);
+	switch (container->storage->status) {
+	case STORAGE_OPEN:		
+		lseek((int) container->storage->handle, (off_t) 0, SEEK_SET);
+		fwrite(header, sizeof(struct Header), 1, container->storage->handle);
+		fflush(container->storage->handle);		
+		break;
+	case STORAGE_CLOSED:
+	case STORAGE_UNDEF:
+	case STORAGE_REMOVED:
+	default:
+		free(header);
+		printf("unsupported storage status\n");
 	}
     return 0;
 }
