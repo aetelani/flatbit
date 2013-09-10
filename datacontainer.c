@@ -28,11 +28,9 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 struct Container * makeContainer(StoragePolicy policy)
 {
     struct Container * container = calloc(1, sizeof(struct Container));
+    container->storage = calloc(1, sizeof(FBStorage));
     container->records = 0; //!TODO count get record count
-    container->mode = policy;
-    
-    if (!container->storage) 
-		container->storage = calloc(1, sizeof(FBStorage));
+    container->mode = policy;		
     
     switch (container->mode)
     {

@@ -1,7 +1,6 @@
 #include <filestorage.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <assert.h>
 #include <datacontainer.h>
 #include <storagebase.h>
 
@@ -57,20 +56,6 @@ int fileStorageClose(struct Container * container)
             printf("closing storage failed\n");
     }
     return failed;
-}
-
-int fileWriteHeader(struct Container * container)
-{
-	//!TODO shortuct, fixthis. abstract might not want to know about container.
-	FBStorage * storage = container->storage;
-	
-    if (storage && storage->status == STORAGE_OPEN)
-    {
-        lseek((int) storage->handle, (off_t) 0, SEEK_SET);
-        fwrite(&fbHeader, sizeof(struct Header), 1, storage->base->handle);
-        fflush(storage->handle);
-    }
-    return 0;
 }
 
 int fileStorageRemove(struct Container * container)
@@ -139,4 +124,31 @@ Index fileGetIndex(struct Container * container, struct Key * pk)
         printf("rec->pk:%u, index:%u\n", pk->pk, index);
     }
     return index;
+}
+
+int fileRemoveStorage(struct Container * container)
+{
+	assert(container && container->storage && container->storage->id);
+    
+    int failed = remove(container->storage->id);
+
+    if (!failed)
+        container->storage->status = STORAGE_REMOVED;
+
+    return failed;
+}
+
+int fileWriteHeader(struct Container * container)
+{
+	assert(container && container->storage && container->storage->handle);	
+	
+	if (container->storage->status == STORAGE_OPEN)
+	{
+		struct Header * header = makeHeader(container);
+        lseek((int) container->storage->handle, (off_t) 0, SEEK_SET);
+        fwrite(header, sizeof(struct Header), 1, container->storage->handle);
+        fflush(container->storage->handle);
+        free(header);
+	}
+    return 0;
 }

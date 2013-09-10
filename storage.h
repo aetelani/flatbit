@@ -21,6 +21,7 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #define STORAGE_H
 #include <stdio.h>
 #include <filestorage.h>
+#include <assert.h>
 
 typedef enum {
     STORAGE_UNDEF=-1, STORAGE_OPEN=0, STORAGE_CLOSED, STORAGE_REMOVED
@@ -44,17 +45,11 @@ typedef struct {
 
 struct StorageBase * fileStorageInit();
 
-/*FBStorage * fbStorage;
-
-FBStorage * openStorage();
-
-int closeStorage(FBStorage * storage);
-
-int removeStorage(FBStorage * storage);*/
-
 struct Header {
 	int version;
 };
+
+struct Header * makeHeader();
 
 static struct Header fbHeader = { .version = 1 };
 

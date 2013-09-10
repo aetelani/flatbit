@@ -19,6 +19,8 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <filestorage.h>
 #include <storagebase.h>
+#include <datacontainer.h>
+#include <stdlib.h>
 
 struct StorageBase * fileStorageInit()
 {	
@@ -29,6 +31,14 @@ struct StorageBase * fileStorageInit()
 	base->read = &fileReadRecord;
 	base->getIndex = &fileGetIndex;
 	return base;
+}
+
+struct Header * makeHeader(struct Container * container)
+{
+	// read container/storage configuration, generate related header.
+	struct Header * header = calloc(1, sizeof(struct Header));
+	header->version = 0;
+	return header;
 }
 
 /*int writeHeader(FBStorage * storage);
