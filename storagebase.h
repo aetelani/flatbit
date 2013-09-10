@@ -18,10 +18,13 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 */
 #ifndef STORAGEBASE_H
 #define STORAGEBASE_H
-#include <datacontainer.h>
 
 struct Header;
+struct Key;
+struct Container;
+struct Record;
 typedef void StorageHandle;
+
 struct StorageBase
 {
     StorageHandle * handle;
@@ -30,6 +33,7 @@ struct StorageBase
     int (*read)(struct Container *container, struct Record * recordOut, unsigned int index);
     int (*open)(struct Container *container);
     int (*close)(struct Container *container);
+    unsigned int (*getIndex)(struct Container * container, struct Key * pk);
 };
 
 static struct StorageBase fileStorage;

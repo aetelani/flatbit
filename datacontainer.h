@@ -23,23 +23,25 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 
 struct StorageBase;
 
-typedef struct DataKey {
+struct Key {
 	int pk;
-} Key;
-
-typedef struct DataLoad {
-	int data;
-} Data;
-
-struct Record {
-	Key key;
-	Data data;
 };
 
-typedef struct {
-	Key key;
-	int index;
-} Index;
+struct Data {
+	int data;
+};
+
+struct Record {
+	struct Key key;
+	struct Data data;
+};
+
+typedef unsigned int Index;
+
+struct IndexKey {
+	struct Key key;
+	unsigned int index;
+};
 
 struct Container {
 	int records;
@@ -51,14 +53,14 @@ struct Container {
 
 struct Container * makeContainer(StoragePolicy s);
 
-int keyCmp(Key * a, Key * b);
+int keyCmp(struct Key * a, struct Key * b);
 
 int writeData(struct Container * container, struct Record * record);
 
 struct Record * copyRecord(struct Record * r);
 
-unsigned int getIndex(struct Container * container, Key * pk);
+unsigned int getIndex(struct Container * container, struct Key * pk);
 
-Data getData(struct Container * container, unsigned int ind);
+struct Data getData(struct Container * container, unsigned int ind);
 
 #endif

@@ -35,17 +35,17 @@ int main()
     int recordCnt = 10;
     for (int i=0; i < recordCnt; i++)
     {
-        Key key = { .pk = i };
-        Data data = { .data = i };
+        struct Key key = { .pk = i };
+        struct Data data = { .data = i };
         struct Record rec = { .key = key, .data = data };
-//        writeData(c, &rec);
+        writeData(c, &rec);
     }
 
     for (int i=0; i < recordCnt; i++)
     {
-        Key key = { .pk = i };
+        struct Key key = { .pk = i };
         unsigned int index  = getIndex(c, &key);
-        Data d = getData(c, index);
+        struct Data d = getData(c, index);
     }
     
     if (c)

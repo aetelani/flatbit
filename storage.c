@@ -16,9 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <storage.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <filestorage.h>
 #include <storagebase.h>
 
@@ -28,8 +26,8 @@ struct StorageBase * fileStorageInit()
 	base->open = &fileStorageOpen; // should be policy based, not probably explicit
 	base->close = &fileStorageClose;
 	base->write = &fileWriteRecord;
-	base->read = &fileReadRecord; 
-	printf("pointer to fileStorage.open: %p\n", base->open);
+	base->read = &fileReadRecord;
+	base->getIndex = &fileGetIndex;
 	return base;
 }
 

@@ -18,11 +18,10 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 */
 #ifndef FILESTORAGE_H
 #define FILESTORAGE_H
-#include <stdio.h>
 
 struct Container;
 struct Record;
-
+struct Key;
 struct FileStorage
 {
 	char * id;
@@ -39,4 +38,6 @@ int fileReadRecord(struct Container *container, struct Record * recordOut, unsig
 int fileWriteRecord(struct Container * container, struct Record * record);
 
 int fileWriteHeader(struct Container * container);
+
+unsigned int fileGetIndex(struct Container * container, struct Key * pk);
 #endif

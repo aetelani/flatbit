@@ -72,15 +72,12 @@ struct Container * makeContainer(StoragePolicy policy)
 int writeData(struct Container * container, struct Record * record)
 {
     //!TODO more methods, now only Append
-    printf("sb->handle: %p\n", container->storage->handle);
-    /*fseek(container->storage->handle, 0, SEEK_END);
-    fwrite(record, sizeof(Record), 1, container->storage->handle);
-    ++container->records;
-    fflush(container->storage->handle);*/
+    assert(container && container->storage && container->storage->base && container->storage->base->write && container->storage->base->handle);
+    container->storage->base->write(container, record);
     return 0;
 }
 
-int keyCmp(Key * a, Key * b)
+int keyCmp(struct Key * a, struct Key * b)
 {
     printf("%i .. %i\n", a->pk, b->pk);
     int ret = a && b ? a->pk == b->pk : 0;
@@ -95,7 +92,7 @@ struct Record * copyRecord(struct Record * r)
     return record;
 }
 
-unsigned int getIndex(struct Container * container, Key * pk)
+unsigned int getIndex(struct Container * container, struct Key * pk)
 {   
     int readBufferSize = 1;
     const int sizeOfRecord = sizeof(struct Record);
@@ -125,7 +122,7 @@ unsigned int getIndex(struct Container * container, Key * pk)
     return index;
 }
 
-Data getData(struct Container * container, unsigned int ind)
+struct Data getData(struct Container * container, unsigned int ind)
 {
     struct Record rec = { .data = 0 };
     int failed = 1;

@@ -10,13 +10,7 @@ int fileStorageRemove(struct Container * container);
 
 int fileStorageOpen(struct Container * container)
 {
-	assert(container != NULL);
-//	container->storage = calloc(1, sizeof(FBStorage));
-	
-	assert(container->storage != NULL);	
-//	container->storage->base = calloc(1, sizeof(struct StorageBase));
-	
-	assert(container->storage->base != NULL);
+	assert(container && container->storage && container->storage->base);
 	
 	FBStorage * storage = container->storage; //shortuct
 
@@ -105,7 +99,7 @@ int fileWriteRecord(struct Container * container, struct Record * record)
     return 0;
 }
 
-int fileReadRecord(struct Container *container, struct Record * recordOut, unsigned int index)
+int fileReadRecord(struct Container *container, struct Record * recordOut, Index index)
 {        
     int failed = fseek(container->storage->base->handle, sizeof(struct Record)*(index)+sizeof(struct Header), SEEK_SET);
     int read = 0;
@@ -115,4 +109,34 @@ int fileReadRecord(struct Container *container, struct Record * recordOut, unsig
         read = fread(recordOut, sizeof(struct Record), 1, container->storage->base->handle);
     }
     return read;
+}
+
+Index fileGetIndex(struct Container * container, struct Key * pk)
+{   
+    int readBufferSize = 1;
+    const int sizeOfRecord = sizeof(struct Record);
+    const int sizeOfHeader = sizeof(struct Header);
+    struct Record rec; unsigned int index=0;
+    int readedValue;
+
+    printf("iterating records: %i\n", container->records);
+    for (; index < container->records; ++index)
+    {
+        int seekTo = sizeOfHeader+sizeOfRecord*index;
+        fseek(container->storage->base->handle, seekTo, SEEK_SET);
+        printf("seekTo %i, ind:%i\n", seekTo, index);
+        readedValue = fread(&rec, sizeof(struct Record), readBufferSize, container->storage->base->handle);
+        
+        if (keyCmp(&rec.key, pk))
+		{
+            printf("found pk match\n");
+            break;
+        }
+    }
+    
+    if (readedValue)
+    {
+        printf("rec->pk:%u, index:%u\n", pk->pk, index);
+    }
+    return index;
 }
