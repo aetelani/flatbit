@@ -18,21 +18,7 @@ int fileStorageOpen(struct Container * container)
         storage->id = "db";
         storage->status = STORAGE_UNDEF;
     }    
-
-    int fileRWFailed = access(storage->id, R_OK | W_OK);
-
-    if (fileRWFailed)
-    {
-        /*int storageRemoveFailed = fileStorageRemove(container); //do fallback
-        
-        if (storageRemoveFailed)
-        {
-            printf("storage remove failed, freeing handle");
-            if (storage && storage->base->handle)
-                free(storage->base->handle);
-        }*/
-    }
-    
+  
     storage->base->handle = fopen(storage->id, "a+");
 
     if (storage->handle)
@@ -46,15 +32,10 @@ int fileStorageOpen(struct Container * container)
 
 int fileStorageClose(struct Container * container)
 {
-	int failed;
-    
-    if (container->storage)
-    {
-        failed = fclose(container->storage->handle);
+	assert(container && container->storage && container->storage->handle);
 
-        if (failed)
-            printf("closing storage failed\n");
-    }
+	int failed = fclose(container->storage->handle);
+
     return failed;
 }
 
@@ -76,7 +57,6 @@ int fileStorageRemove(struct Container * container)
 
 int fileWriteRecord(struct Container * container, struct Record * record)
 {
-    printf("sb->handle: %p\n", container->storage->handle);
     fseek(container->storage->base->handle, 0, SEEK_END);
     fwrite(record, sizeof(struct Record), 1, container->storage->base->handle);
     ++container->records;
