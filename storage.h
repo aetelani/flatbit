@@ -23,6 +23,8 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <filestorage.h>
 #include <assert.h>
 
+static const int STORAGE_MAX_COUNT = 4;
+
 typedef enum {
     STORAGE_UNDEF=-1, STORAGE_OPEN=0, STORAGE_CLOSED, STORAGE_REMOVED
 } FBStorageStatus;
@@ -31,21 +33,18 @@ typedef enum
 {
 	STORAGE_APPEND
 } StorageMode;
-#define STORAGE_MAX_COUNT 4;
+
 struct StorageBase;
-typedef struct Storage {
+struct Storage {
 	const char * id;
-    int type;
-    int mode;
-	FILE * 	handle;
     int (*write)(struct Container *c, struct Record *record);
     int (*read)(struct Container *c, struct Record * recordOut, unsigned int index);
     int (*open)(struct Container *c);
     int (*close)(struct Container *c);
     unsigned int (*getIndex)(struct Container * container, struct Key * pk);    
-	struct StorageBase * base[4];
+	struct StorageBase * base[STORAGE_MAX_COUNT];
     FBStorageStatus status;
-} FBStorage;
+};
 
 struct Storage * storageInit(struct Container * container);
 

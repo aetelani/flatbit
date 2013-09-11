@@ -81,9 +81,9 @@ unsigned int getIndex(struct Container * container, struct Key * pk)
     for (; index < container->records; ++index)
     {
         int seekTo = sizeOfHeader+sizeOfRecord*index;
-        fseek(container->storage->base[CONTAINER_STORAGE_FILE]->handle, seekTo, SEEK_SET);
+        fseek(container->storage->base[FILE_BASE_IND]->handle, seekTo, SEEK_SET);
         printf("seekTo %i, ind:%i\n", seekTo, index);
-        readedValue = fread(&rec, sizeof(struct Record), readBufferSize, container->storage->base[CONTAINER_STORAGE_FILE]->handle);
+        readedValue = fread(&rec, sizeof(struct Record), readBufferSize, container->storage->base[FILE_BASE_IND]->handle);
         
         if (keyCmp(&rec.key, pk))
 		{
@@ -104,12 +104,12 @@ struct Data getData(struct Container * container, unsigned int ind)
     struct Record rec = { .data = 0 };
     int failed = 1;
     
-    assert(container && container->storage && container->storage->base[CONTAINER_STORAGE_FILE] && container->storage->base[CONTAINER_STORAGE_FILE]->handle);
-	failed = fseek(container->storage->base[CONTAINER_STORAGE_FILE]->handle, sizeof(struct Record)*(ind)+sizeof(struct Header), SEEK_SET);
+    assert(container && container->storage && container->storage->base[FILE_BASE_IND] && container->storage->base[FILE_BASE_IND]->handle);
+	failed = fseek(container->storage->base[FILE_BASE_IND]->handle, sizeof(struct Record)*(ind)+sizeof(struct Header), SEEK_SET);
     
     if (!failed)
     {
-        int read = fread(&rec, sizeof(struct Record), 1, container->storage->base[CONTAINER_STORAGE_FILE]->handle);
+        int read = fread(&rec, sizeof(struct Record), 1, container->storage->base[FILE_BASE_IND]->handle);
     }
     return rec.data;
 }

@@ -19,6 +19,8 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef FILESTORAGE_H
 #define FILESTORAGE_H
 
+#define FILE_BASE_IND 0
+
 struct Container;
 struct Record;
 struct Key;

@@ -23,19 +23,20 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <datacontainer.h>
 #include <stdlib.h>
 
-#define FILE_BASE_IND 0
-#define MEM_BASE_IND 1
-
 int storageOpen(struct Container * container)
 {
-	container->storage->base[FILE_BASE_IND]->open(container);
-	container->storage->base[MEM_BASE_IND]->open(container);
+	if (container->storage->base[FILE_BASE_IND])
+		container->storage->base[FILE_BASE_IND]->open(container);
+		
+	if (container->storage->base[MEM_BASE_IND])
+		container->storage->base[MEM_BASE_IND]->open(container);
+
 	return 0;
 }
 
 int storageClose(struct Container * container)
 {
-	container->storage->base[CONTAINER_STORAGE_FILE]->close(container);
+	container->storage->base[FILE_BASE_IND]->close(container);
 	return 0;
 }
 
@@ -81,6 +82,6 @@ int writeData(struct Container * container, struct Record * record)
 {
     //!TODO more methods, now only Append
 //    assert(container && container->storage && container->storage->base && container->storage->base->write && container->storage->base->handle);
-    container->storage->base[CONTAINER_STORAGE_FILE]->write(container, record);
+    container->storage->base[FILE_BASE_IND]->write(container, record);
     return 0;
 }

@@ -51,7 +51,7 @@ struct Container {
 	int records;
 	enum Policy policy;
 	Index *index;
-	FBStorage * storage;
+	struct Storage * storage;
 	//change this to FBStorage and use storagebase for generic api for operations that use file apia tai mitä sitten tarviikaan.!!!!
 };
 

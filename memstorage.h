@@ -1,6 +1,8 @@
 #ifndef MEMSTORAGE_H
 #define MEMSTORAGE_H
 
+#define MEM_BASE_IND 1
+
 struct Container;
 struct Record;
 struct Key;

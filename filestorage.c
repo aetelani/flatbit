@@ -11,7 +11,7 @@ int fileStorageOpen(struct Container * container)
 {
 	assert(container && container->storage && container->storage->base);
 	
-	FBStorage * storage = container->storage; //shortuct
+	struct Storage * storage = container->storage; //shortuct
 
     if (storage)
     {
@@ -19,9 +19,9 @@ int fileStorageOpen(struct Container * container)
         storage->status = STORAGE_UNDEF;
     }    
   
-    storage->base[CONTAINER_STORAGE_FILE]->handle = fopen(storage->id, "a+");
+    storage->base[FILE_BASE_IND]->handle = fopen(storage->id, "a+");
 
-    if (storage->handle)
+    if (container->storage->base[FILE_BASE_IND]->handle)
     {
         int headerFailed = fileWriteHeader(container);
         storage->status = headerFailed ? STORAGE_UNDEF : STORAGE_OPEN;
@@ -32,9 +32,7 @@ int fileStorageOpen(struct Container * container)
 
 int fileStorageClose(struct Container * container)
 {
-	assert(container && container->storage && container->storage->handle);
-
-	int failed = fclose(container->storage->handle);
+	int failed = fclose(container->storage->base[FILE_BASE_IND]->handle);
 
     return failed;
 }
@@ -57,21 +55,21 @@ int fileStorageRemove(struct Container * container)
 
 int fileWriteRecord(struct Container * container, struct Record * record)
 {
-    fseek(container->storage->base[CONTAINER_STORAGE_FILE]->handle, 0, SEEK_END);
-    fwrite(record, sizeof(struct Record), 1, container->storage->base[CONTAINER_STORAGE_FILE]->handle);
+    fseek(container->storage->base[FILE_BASE_IND]->handle, 0, SEEK_END);
+    fwrite(record, sizeof(struct Record), 1, container->storage->base[FILE_BASE_IND]->handle);
     ++container->records;
-    fflush(container->storage->handle);
+    fflush(container->storage->base[FILE_BASE_IND]->handle);
     return 0;
 }
 
 int fileReadRecord(struct Container *container, struct Record * recordOut, Index index)
 {        
-    int failed = fseek(container->storage->base[CONTAINER_STORAGE_FILE]->handle, sizeof(struct Record)*(index)+sizeof(struct Header), SEEK_SET);
+    int failed = fseek(container->storage->base[FILE_BASE_IND]->handle, sizeof(struct Record)*(index)+sizeof(struct Header), SEEK_SET);
     int read = 0;
     
     if (!failed)
     {
-        read = fread(recordOut, sizeof(struct Record), 1, container->storage->base[CONTAINER_STORAGE_FILE]->handle);
+        read = fread(recordOut, sizeof(struct Record), 1, container->storage->base[FILE_BASE_IND]->handle);
     }
     return read;
 }
@@ -88,9 +86,9 @@ Index fileGetIndex(struct Container * container, struct Key * pk)
     for (; index < container->records; ++index)
     {
         int seekTo = sizeOfHeader+sizeOfRecord*index;
-        fseek(container->storage->base[CONTAINER_STORAGE_FILE]->handle, seekTo, SEEK_SET);
+        fseek(container->storage->base[FILE_BASE_IND]->handle, seekTo, SEEK_SET);
         printf("seekTo %i, ind:%i\n", seekTo, index);
-        readedValue = fread(&rec, sizeof(struct Record), readBufferSize, container->storage->base[CONTAINER_STORAGE_FILE]->handle);
+        readedValue = fread(&rec, sizeof(struct Record), readBufferSize, container->storage->base[FILE_BASE_IND]->handle);
         
         if (keyCmp(&rec.key, pk))
 		{
@@ -120,14 +118,13 @@ int fileRemoveStorage(struct Container * container)
 
 int fileWriteHeader(struct Container * container)
 {
-	assert(container && container->storage && container->storage->handle);
 	struct Header * header = makeHeader(container);
 	
 	switch (container->storage->status) {
 	case STORAGE_OPEN:		
-		lseek((int) container->storage->handle, (off_t) 0, SEEK_SET);
-		fwrite(header, sizeof(struct Header), 1, container->storage->handle);
-		fflush(container->storage->handle);		
+		lseek((int) container->storage->base[FILE_BASE_IND]->handle, (off_t) 0, SEEK_SET);
+		fwrite(header, sizeof(struct Header), 1, container->storage->base[FILE_BASE_IND]->handle);
+		fflush(container->storage->base[FILE_BASE_IND]->handle);
 		break;
 	case STORAGE_CLOSED:
 	case STORAGE_UNDEF:
