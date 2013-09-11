@@ -31,19 +31,23 @@ typedef enum
 {
 	STORAGE_APPEND
 } StorageMode;
-
+#define STORAGE_MAX_COUNT 4;
 struct StorageBase;
-typedef struct {
+typedef struct Storage {
 	const char * id;
     int type;
     int mode;
 	FILE * 	handle;
-	void (*setHandle) (FILE*);
-	struct StorageBase * base;	
+    int (*write)(struct Container *c, struct Record *record);
+    int (*read)(struct Container *c, struct Record * recordOut, unsigned int index);
+    int (*open)(struct Container *c);
+    int (*close)(struct Container *c);
+    unsigned int (*getIndex)(struct Container * container, struct Key * pk);    
+	struct StorageBase * base[4];
     FBStorageStatus status;
 } FBStorage;
 
-struct StorageBase * fileStorageInit();
+struct Storage * storageInit(struct Container * container);
 
 struct Header {
 	int version;

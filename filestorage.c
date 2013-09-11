@@ -19,7 +19,7 @@ int fileStorageOpen(struct Container * container)
         storage->status = STORAGE_UNDEF;
     }    
   
-    storage->base->handle = fopen(storage->id, "a+");
+    storage->base[CONTAINER_STORAGE_FILE]->handle = fopen(storage->id, "a+");
 
     if (storage->handle)
     {
@@ -57,8 +57,8 @@ int fileStorageRemove(struct Container * container)
 
 int fileWriteRecord(struct Container * container, struct Record * record)
 {
-    fseek(container->storage->base->handle, 0, SEEK_END);
-    fwrite(record, sizeof(struct Record), 1, container->storage->base->handle);
+    fseek(container->storage->base[CONTAINER_STORAGE_FILE]->handle, 0, SEEK_END);
+    fwrite(record, sizeof(struct Record), 1, container->storage->base[CONTAINER_STORAGE_FILE]->handle);
     ++container->records;
     fflush(container->storage->handle);
     return 0;
@@ -66,12 +66,12 @@ int fileWriteRecord(struct Container * container, struct Record * record)
 
 int fileReadRecord(struct Container *container, struct Record * recordOut, Index index)
 {        
-    int failed = fseek(container->storage->base->handle, sizeof(struct Record)*(index)+sizeof(struct Header), SEEK_SET);
+    int failed = fseek(container->storage->base[CONTAINER_STORAGE_FILE]->handle, sizeof(struct Record)*(index)+sizeof(struct Header), SEEK_SET);
     int read = 0;
     
     if (!failed)
     {
-        read = fread(recordOut, sizeof(struct Record), 1, container->storage->base->handle);
+        read = fread(recordOut, sizeof(struct Record), 1, container->storage->base[CONTAINER_STORAGE_FILE]->handle);
     }
     return read;
 }
@@ -88,9 +88,9 @@ Index fileGetIndex(struct Container * container, struct Key * pk)
     for (; index < container->records; ++index)
     {
         int seekTo = sizeOfHeader+sizeOfRecord*index;
-        fseek(container->storage->base->handle, seekTo, SEEK_SET);
+        fseek(container->storage->base[CONTAINER_STORAGE_FILE]->handle, seekTo, SEEK_SET);
         printf("seekTo %i, ind:%i\n", seekTo, index);
-        readedValue = fread(&rec, sizeof(struct Record), readBufferSize, container->storage->base->handle);
+        readedValue = fread(&rec, sizeof(struct Record), readBufferSize, container->storage->base[CONTAINER_STORAGE_FILE]->handle);
         
         if (keyCmp(&rec.key, pk))
 		{

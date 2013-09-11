@@ -32,8 +32,9 @@ struct StorageBase
     int (*write)(struct Container *container, struct Record *record);
     int (*read)(struct Container *container, struct Record * recordOut, unsigned int index);
     int (*open)(struct Container *container);
-    int (*close)(struct Container *container);
+    int (*close)(struct Container *container);    
     unsigned int (*getIndex)(struct Container * container, struct Key * pk);
+    int (*flush)(struct StorageBase * base);
 };
 
 static struct StorageBase fileStorage;

@@ -25,54 +25,33 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <malloc.h>
 #include <string.h>
 
-struct Container * makeContainer(StoragePolicy policy)
+struct Container * makeContainer(enum Policy apolicy)
 {
+	
     struct Container * container = calloc(1, sizeof(struct Container));
-    container->storage = calloc(1, sizeof(FBStorage));
     container->records = 0; //!TODO count get record count
-    container->mode = policy;		
+    container->policy = apolicy;
+    container->storage = storageInit(container);
+//    int failed = container->storage->open(container);
     
-    switch (container->mode)
+    /*switch (container->policy)
     {
-		case CONTAINER_STORE_IN_FILE:
-		{
-			printf("CONTAINER_STORE_IN_FILE\n");			
-			container->storage->base =	fileStorageInit();
-			assert(container && container->storage && container->storage->base && container->storage->base->open);
+		case CONTAINER_STORAGE_FILE:
+			assert(container && container->storage && container->storage->base[0] && container->storage->base[0]->open);
 			int failed = container->storage->base->open(container); //little long path, maybe container ctx would be ok
-			container->storage->mode = STORAGE_APPEND;
-			container->storage->type = CONTAINER_STORE_IN_FILE;
+//			container->storage->mode = STORAGE_APPEND;
+//			container->storage->type = CONTAINER_STORE_IN_FILE;
 			break;
-		}
-		case CONTAINER_STORE_BUFFERED:
-		{
-			printf("CONTAINER_STORE_BUFFERED\n");
-			break;
-		}
-		case CONTAINER_STORE_IN_MEMORY:
-		{
+		case CONTAINER_STORE_MEMORY:
 			printf("CONTAINER_STORE_IN_MEMORY\n");
-			/*storageBase->handle = calloc(1, sizeof(Header));
-			storageBase->mode = STORAGE_APPEND;
-			storageBase->type = CONTAINER_STORE_IN_MEMORY;
-			container->storage = storageBase;*/
+//			storageBase->handle = calloc(1, sizeof(Header));
+//			storageBase->mode = STORAGE_APPEND;
+//			storageBase->type = CONTAINER_STORE_IN_MEMORY;
+//			container->storage = storageBase;
 			break;
-		}
-		default:
-			printf("policy not found\n");
-			free(container->storage);
-			free(container);
-	}
+	}*/
 
     return container;
-}
-
-int writeData(struct Container * container, struct Record * record)
-{
-    //!TODO more methods, now only Append
-    assert(container && container->storage && container->storage->base && container->storage->base->write && container->storage->base->handle);
-    container->storage->base->write(container, record);
-    return 0;
 }
 
 int keyCmp(struct Key * a, struct Key * b)
@@ -102,9 +81,9 @@ unsigned int getIndex(struct Container * container, struct Key * pk)
     for (; index < container->records; ++index)
     {
         int seekTo = sizeOfHeader+sizeOfRecord*index;
-        fseek(container->storage->base->handle, seekTo, SEEK_SET);
+        fseek(container->storage->base[CONTAINER_STORAGE_FILE]->handle, seekTo, SEEK_SET);
         printf("seekTo %i, ind:%i\n", seekTo, index);
-        readedValue = fread(&rec, sizeof(struct Record), readBufferSize, container->storage->base->handle);
+        readedValue = fread(&rec, sizeof(struct Record), readBufferSize, container->storage->base[CONTAINER_STORAGE_FILE]->handle);
         
         if (keyCmp(&rec.key, pk))
 		{
@@ -125,12 +104,12 @@ struct Data getData(struct Container * container, unsigned int ind)
     struct Record rec = { .data = 0 };
     int failed = 1;
     
-    assert(container && container->storage && container->storage->base && container->storage->base->handle);
-	failed = fseek(container->storage->base->handle, sizeof(struct Record)*(ind)+sizeof(struct Header), SEEK_SET);
+    assert(container && container->storage && container->storage->base[CONTAINER_STORAGE_FILE] && container->storage->base[CONTAINER_STORAGE_FILE]->handle);
+	failed = fseek(container->storage->base[CONTAINER_STORAGE_FILE]->handle, sizeof(struct Record)*(ind)+sizeof(struct Header), SEEK_SET);
     
     if (!failed)
     {
-        int read = fread(&rec, sizeof(struct Record), 1, container->storage->base->handle);
+        int read = fread(&rec, sizeof(struct Record), 1, container->storage->base[CONTAINER_STORAGE_FILE]->handle);
     }
     return rec.data;
 }

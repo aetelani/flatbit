@@ -18,19 +18,55 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <stdlib.h>
 #include <filestorage.h>
+#include <memstorage.h>
 #include <storagebase.h>
 #include <datacontainer.h>
 #include <stdlib.h>
 
-struct StorageBase * fileStorageInit()
-{	
-	struct StorageBase * base = calloc(1, sizeof(struct StorageBase));
-	base->open = &fileStorageOpen; // should be policy based, not probably explicit
-	base->close = &fileStorageClose;
-	base->write = &fileWriteRecord;
-	base->read = &fileReadRecord;
-	base->getIndex = &fileGetIndex;
-	return base;
+#define FILE_BASE_IND 0
+#define MEM_BASE_IND 1
+
+int storageOpen(struct Container * container)
+{
+	container->storage->base[FILE_BASE_IND]->open(container);
+	container->storage->base[MEM_BASE_IND]->open(container);
+	return 0;
+}
+
+int storageClose(struct Container * container)
+{
+	container->storage->base[CONTAINER_STORAGE_FILE]->close(container);
+	return 0;
+}
+
+struct Storage * storageInit(struct Container * container)
+{
+	assert(container && !container->storage);
+	container->storage = calloc(1, sizeof(struct Storage));		
+	container->storage->open = &storageOpen;
+	container->storage->close = &storageClose;
+
+	switch (container->policy) {
+	case CONTAINER_STORAGE_FILE:
+		container->storage->base[FILE_BASE_IND] = calloc(1, sizeof(struct StorageBase));
+		container->storage->base[FILE_BASE_IND]->open = &fileStorageOpen;
+		container->storage->base[FILE_BASE_IND]->close = &fileStorageClose;
+		container->storage->base[FILE_BASE_IND]->write = &fileWriteRecord;
+		container->storage->base[FILE_BASE_IND]->read = &fileReadRecord;
+		container->storage->base[FILE_BASE_IND]->getIndex = &fileGetIndex;
+		break;
+	case CONTAINER_STORAGE_MEMORY:
+		container->storage->base[MEM_BASE_IND] = calloc(1, sizeof(struct StorageBase));
+		container->storage->base[MEM_BASE_IND]->open = &memStorageOpen;
+		container->storage->base[MEM_BASE_IND]->close = &memStorageClose;
+		container->storage->base[MEM_BASE_IND]->write = &memWriteRecord;
+		container->storage->base[MEM_BASE_IND]->read = &memReadRecord;
+		container->storage->base[MEM_BASE_IND]->getIndex = &memGetIndex;
+		break;
+		break;
+	}	
+
+	return container->storage;
 }
 
 struct Header * makeHeader(struct Container * container)
@@ -41,80 +77,10 @@ struct Header * makeHeader(struct Container * container)
 	return header;
 }
 
-/*int writeHeader(FBStorage * storage);
-
-FBStorage * openStorage()
+int writeData(struct Container * container, struct Record * record)
 {
-    FBStorage * storage = calloc(1, sizeof(FBStorage));
-
-    if (storage)
-    {
-        storage->id = "db";
-        storage->status = STORAGE_UNDEF;
-    }    
-
-    int fileRWFailed = access(storage->id, R_OK | W_OK);
-
-    if (fileRWFailed)
-    {
-        int storageRemoveFailed = removeStorage(storage);
-        
-        if (storageRemoveFailed)
-        {
-            printf("storage remove failed, freeing handle");
-            if (storage && storage->handle)
-                free(storage->handle);
-        }
-    }
-    
-    storage->handle = fopen(storage->id, "a+");
-
-    if (storage->handle)
-    {
-        int headerFailed = writeHeader(storage);
-        storage->status = headerFailed ? STORAGE_UNDEF : STORAGE_OPEN;
-    }
-    
-    return storage;
-}
-
-int closeStorage(FBStorage * storage)
-{
-    int failed;
-    
-    if (storage)
-    {
-        failed = fclose(storage->handle);
-
-        if (failed)
-            printf("closing storage failed\n");
-    }
-    return failed;
-}
-
-int removeStorage(FBStorage * storage)
-{
-    int failed;
-
-    if (storage)
-        return STORAGE_UNDEF;
-    
-    if (storage->id)
-        failed = remove(storage->id);
-
-    if (!failed)
-        storage->status = STORAGE_REMOVED;
-
-    return failed;
-}
-
-int writeHeader(FBStorage * storage)
-{
-    if (storage && storage->status == STORAGE_OPEN)
-    {
-        lseek((int) storage->handle, (off_t) 0, SEEK_SET);
-        fwrite(&fbHeader, sizeof(struct Header), 1, storage->handle);
-        fflush(storage->handle);
-    }
+    //!TODO more methods, now only Append
+//    assert(container && container->storage && container->storage->base && container->storage->base->write && container->storage->base->handle);
+    container->storage->base[CONTAINER_STORAGE_FILE]->write(container, record);
     return 0;
-}*/
+}

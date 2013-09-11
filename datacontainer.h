@@ -43,15 +43,19 @@ struct IndexKey {
 	unsigned int index;
 };
 
+enum Policy {
+	CONTAINER_STORAGE_FILE=1, CONTAINER_STORAGE_MEMORY=2
+};
+
 struct Container {
 	int records;
-	int mode;
+	enum Policy policy;
 	Index *index;
 	FBStorage * storage;
 	//change this to FBStorage and use storagebase for generic api for operations that use file apia tai mitä sitten tarviikaan.!!!!
 };
 
-struct Container * makeContainer(StoragePolicy s);
+struct Container * makeContainer(enum Policy s);
 
 int keyCmp(struct Key * a, struct Key * b);
 

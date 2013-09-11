@@ -26,11 +26,10 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 
 int main()
 {
-	StoragePolicy storagePolicy = CONTAINER_STORE_IN_FILE;
+	enum Policy policy = CONTAINER_STORAGE_FILE;
 	
-    struct Container *c = NULL;
-    
-	c = makeContainer(storagePolicy);
+    struct Container *c = makeContainer(policy);
+    c->storage->open(c);
 
     int recordCnt = 10;
     for (int i=0; i < recordCnt; i++)
