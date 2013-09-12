@@ -36,7 +36,12 @@ int storageOpen(struct Container * container)
 
 int storageClose(struct Container * container)
 {
-	container->storage->base[FILE_BASE_IND]->close(container);
+	if (container->storage->base[FILE_BASE_IND])
+		container->storage->base[FILE_BASE_IND]->close(container);
+    
+    if (container->storage->base[MEM_BASE_IND])
+		container->storage->base[MEM_BASE_IND]->close(container);
+		
 	return 0;
 }
 
@@ -82,6 +87,17 @@ int writeData(struct Container * container, struct Record * record)
 {
     //!TODO more methods, now only Append
 //    assert(container && container->storage && container->storage->base && container->storage->base->write && container->storage->base->handle);
-    container->storage->base[FILE_BASE_IND]->write(container, record);
+	if (container->storage->base[FILE_BASE_IND])
+		container->storage->base[FILE_BASE_IND]->write(container, record);
+    
+    if (container->storage->base[MEM_BASE_IND])
+		container->storage->base[MEM_BASE_IND]->write(container, record);
     return 0;
+}
+
+int keyCmp(struct Key * a, struct Key * b)
+{    
+    int ret = a && b ? a->pk == b->pk : 0;
+	printf("%i == %i -> %i\n", a->pk, b->pk, ret);
+    return ret;
 }

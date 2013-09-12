@@ -55,9 +55,10 @@ struct Container {
 	//change this to FBStorage and use storagebase for generic api for operations that use file apia tai mitä sitten tarviikaan.!!!!
 };
 
-struct Container * makeContainer(enum Policy s);
+static const int sizeOfRecord = sizeof(struct Record);
+static const int sizeOfHeader = sizeof(struct Header);
 
-int keyCmp(struct Key * a, struct Key * b);
+struct Container * makeContainer(enum Policy s);
 
 int writeData(struct Container * container, struct Record * record);
 

@@ -26,7 +26,7 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 
 int main()
 {
-	enum Policy policy = CONTAINER_STORAGE_FILE;
+	enum Policy policy = CONTAINER_STORAGE_MEMORY;
 	
     struct Container *c = makeContainer(policy);
     c->storage->open(c);

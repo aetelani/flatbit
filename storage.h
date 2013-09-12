@@ -21,6 +21,7 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #define STORAGE_H
 #include <stdio.h>
 #include <filestorage.h>
+#include <memstorage.h>
 #include <assert.h>
 
 static const int STORAGE_MAX_COUNT = 4;
@@ -56,4 +57,5 @@ struct Header * makeHeader();
 
 static struct Header fbHeader = { .version = 1 };
 
+int keyCmp(struct Key * a, struct Key * b);
 #endif
