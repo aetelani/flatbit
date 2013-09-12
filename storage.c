@@ -98,6 +98,41 @@ int writeData(struct Container * container, struct Record * record)
 int keyCmp(struct Key * a, struct Key * b)
 {    
     int ret = a && b ? a->pk == b->pk : 0;
-	printf("%i == %i -> %i\n", a->pk, b->pk, ret);
+//	printf("%i == %i -> %i\n", a->pk, b->pk, ret);
+    return ret;
+}
+
+unsigned int getIndex(struct Container * container, struct Key * pk)
+{   
+    int readBufferSize = 1;
+    struct Record rec; unsigned int index=0;
+    int readedValue;
+    assert(pk);
+
+	if (container->storage->base[MEM_BASE_IND])
+		index = container->storage->base[MEM_BASE_IND]->getIndex(container, pk);
+	else
+		index = container->storage->base[FILE_BASE_IND]->getIndex(container, pk);
+
+	printf("founded index: %i\n", index);
+
+    return index;
+}
+
+int read(struct Container * container, struct Record * outRecord, unsigned int index)
+{
+    int ret = 0;
+    
+	if (container->storage->base[MEM_BASE_IND])
+		ret = container->storage->base[MEM_BASE_IND]->read(container, outRecord, index);
+	else
+		ret = container->storage->base[FILE_BASE_IND]->read(container, outRecord, index);
+    
+//	assert(container && container->storage && container->storage->base[FILE_BASE_IND] && container->storage->base[FILE_BASE_IND]->handle);
+//	failed = fseek(container->storage->base[FILE_BASE_IND]->handle, sizeof(struct Record)*(ind)+sizeof(struct Header), SEEK_SET);
+    
+//    if (!failed)
+//        int read = fread(&rec, sizeof(struct Record), 1, container->storage->base[FILE_BASE_IND]->handle);
+
     return ret;
 }

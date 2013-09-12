@@ -20,6 +20,7 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <storage.h>
 #include <datacontainer.h>
 #include <storage.h>
+#include <stdlib.h>
 
 //!TODO multitable, multifile, abstract file & format
 // Init File actually, one table, one file for now.
@@ -40,11 +41,14 @@ int main()
         writeData(c, &rec);
     }
 
+	struct Record * r = malloc(sizeOfRecord);
     for (int i=0; i < recordCnt; i++)
     {
         struct Key key = { .pk = i };
         unsigned int index  = getIndex(c, &key);
-        struct Data d = getData(c, index);
+        int res = -1;
+        if (index)
+			res = c->storage->read(c, r, index);
     }
     
     if (c)
