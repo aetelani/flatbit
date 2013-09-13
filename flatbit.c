@@ -32,7 +32,7 @@ int main()
     struct Container *c = makeContainer(policy);
     c->storage->open(c);
 
-    int recordCnt = 10;
+    int recordCnt = 3;
     for (int i=0; i < recordCnt; i++)
     {
         struct Key key = { .pk = i };
@@ -42,7 +42,7 @@ int main()
     }
 
 	struct Record * r = malloc(sizeOfRecord);
-    for (int i=0; i < recordCnt; i++)
+    for (int i=1; i < recordCnt; i++)
     {
         struct Key key = { .pk = i };
         unsigned int index  = getIndex(c, &key);

@@ -128,11 +128,5 @@ int read(struct Container * container, struct Record * outRecord, unsigned int i
 	else
 		ret = container->storage->base[FILE_BASE_IND]->read(container, outRecord, index);
     
-//	assert(container && container->storage && container->storage->base[FILE_BASE_IND] && container->storage->base[FILE_BASE_IND]->handle);
-//	failed = fseek(container->storage->base[FILE_BASE_IND]->handle, sizeof(struct Record)*(ind)+sizeof(struct Header), SEEK_SET);
-    
-//    if (!failed)
-//        int read = fread(&rec, sizeof(struct Record), 1, container->storage->base[FILE_BASE_IND]->handle);
-
     return ret;
 }

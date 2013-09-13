@@ -8,7 +8,7 @@ int memStorageOpen(struct Container * c)
 {
 	c->storage->base[MEM_BASE_IND]->header = malloc(sizeOfHeader);
 	c->storage->base[MEM_BASE_IND]->handle = calloc(c->records, sizeOfRecord);
-	printf("size of %d allocated mem\n", c->records * sizeOfRecord);
+	printf("size of %d allocated mem at %p\n", c->records * sizeOfRecord, c->storage->base[MEM_BASE_IND]->handle);
 	return 0;
 }
 
@@ -21,9 +21,7 @@ int memStorageClose(struct Container * c)
 
 int memReadRecord(struct Container * c, struct Record * recordOut, unsigned int index)
 {
-	struct Record recOut;
-	memcpy(c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * index, &recOut, sizeOfRecord);
-	printf("read record key: %i\n", recOut.key.pk);
+	memcpy(c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * index, recordOut, sizeOfRecord);
 	return 0;
 }
 
@@ -49,7 +47,9 @@ unsigned int memGetIndex(struct Container * c, struct Key * pk)
 	struct Record rec; unsigned int index=0;
 	for (; index <= c->records; index++)
 	{
-		memcpy(c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * index, &rec, sizeOfRecord);
+		memcpy(&rec, c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * index, sizeOfRecord);
+		printf("getIndex, index %i, pk:%i, rec.pk:%i", index, pk->pk, rec.key.pk);
+		printf(" dataoffsetptr %p, with offset:%i\n",c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * index, sizeOfRecord * index);
 		if (keyCmp(&rec.key, pk))
 		{
 			printf("found pk match\n");
