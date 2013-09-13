@@ -21,7 +21,7 @@ int memStorageClose(struct Container * c)
 
 int memReadRecord(struct Container * c, struct Record * recordOut, unsigned int index)
 {
-	memcpy(c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * index, recordOut, sizeOfRecord);
+	memcpy(recordOut, c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * index, sizeOfRecord);
 	return 0;
 }
 

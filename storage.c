@@ -121,6 +121,8 @@ unsigned int getIndex(struct Container * container, struct Key * pk)
 
 int read(struct Container * container, struct Record * outRecord, unsigned int index)
 {
+	assert(container && outRecord && index);
+
     int ret = 0;
     
 	if (container->storage->base[MEM_BASE_IND])
