@@ -23,13 +23,19 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <datacontainer.h>
 #include <stdlib.h>
 
+int storageRead(struct Container * container, struct Record * outRecord, unsigned int index);
+
 int storageOpen(struct Container * container)
 {
 	if (container->storage->base[FILE_BASE_IND])
+	{
 		container->storage->base[FILE_BASE_IND]->open(container);
+	}
 		
 	if (container->storage->base[MEM_BASE_IND])
+	{
 		container->storage->base[MEM_BASE_IND]->open(container);
+	}
 
 	return 0;
 }
@@ -37,10 +43,14 @@ int storageOpen(struct Container * container)
 int storageClose(struct Container * container)
 {
 	if (container->storage->base[FILE_BASE_IND])
+	{
 		container->storage->base[FILE_BASE_IND]->close(container);
+	}
     
     if (container->storage->base[MEM_BASE_IND])
+    {
 		container->storage->base[MEM_BASE_IND]->close(container);
+	}
 		
 	return 0;
 }
@@ -51,6 +61,7 @@ struct Storage * storageInit(struct Container * container)
 	container->storage = calloc(1, sizeof(struct Storage));		
 	container->storage->open = &storageOpen;
 	container->storage->close = &storageClose;
+	container->storage->read = &storageRead;
 
 	switch (container->policy) {
 	case CONTAINER_STORAGE_FILE:
@@ -68,7 +79,6 @@ struct Storage * storageInit(struct Container * container)
 		container->storage->base[MEM_BASE_IND]->write = &memWriteRecord;
 		container->storage->base[MEM_BASE_IND]->read = &memReadRecord;
 		container->storage->base[MEM_BASE_IND]->getIndex = &memGetIndex;
-		break;
 		break;
 	}	
 
@@ -119,10 +129,10 @@ unsigned int getIndex(struct Container * container, struct Key * pk)
     return index;
 }
 
-int read(struct Container * container, struct Record * outRecord, unsigned int index)
+int storageRead(struct Container * container, struct Record * outRecord, unsigned int index)
 {
+	printf("read: value with index: %i\n", index);
 	assert(container && outRecord && index);
-
     int ret = 0;
     
 	if (container->storage->base[MEM_BASE_IND])

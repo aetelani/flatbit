@@ -48,7 +48,10 @@ int main()
         unsigned int index  = getIndex(c, &key);
         int res = -1;
         if (index)
+        { 
+			printf("flatbit.c with index: %i\n", index);
 			res = c->storage->read(c, r, index);
+		}
     }
     
     if (c)
