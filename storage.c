@@ -24,6 +24,8 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 
 int storageRead(struct Container * container, struct Record * outRecord, unsigned int index);
+int storageClose(struct Container * container);
+int storageOpen(struct Container * container);
 
 int storageOpen(struct Container * container)
 {
