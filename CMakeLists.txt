@@ -9,3 +9,11 @@ SET (CMAKE_C_FLAGS_DEBUG          "-g")
 SET (CMAKE_C_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
 SET (CMAKE_C_FLAGS_RELEASE        "-O4 -DNDEBUG")
 SET (CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g")
+
+
+configure_file (
+  "${PROJECT_SOURCE_DIR}/flatbitconfig.h.in"
+  "${PROJECT_BINARY_DIR}/flatbitconfig.h"
+  )
+
+include_directories("${PROJECT_BINARY_DIR}")

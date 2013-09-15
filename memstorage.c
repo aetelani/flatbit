@@ -3,14 +3,34 @@
 #include <storagebase.h>
 #include <stdlib.h>
 #include <string.h>
+#include <flatbitconfig.h>
 
-const int MAX_NUMBER_OF_RECORDS_IN_SEGMENT = 100;
-const int SEGMENT_SIZE = sizeOfRecord * MAX_NUMBER_OF_RECORDS_IN_SEGMENT;
+extern const int maxNumberRecordsInSegment;
+extern const int maxNumberOfSegments;
+
+enum MemSegmentStatus {
+    MEM_SEG_OK, MEM_SEG_FULL
+};
+
+enum MemStorageStatus {
+    MEM_STORAGE_OK, MEM_STORAGE_FULL
+};
+
+const int segmentSize()
+{
+    return maxNumberRecordsInSegment * sizeOfRecord;
+}
+
+enum MemStorageStatus memStorageStatus(struct Container * c)
+{
+    return c->records <= maxNumberRecordsInSegment * maxNumberOfSegments ? MEM_STORAGE_OK : MEM_STORAGE_FULL;
+}
 
 int memStorageOpen(struct Container * c)
 {
 	c->storage->base[MEM_BASE_IND]->header = malloc(sizeOfHeader);
-	c->storage->base[MEM_BASE_IND]->handle = calloc(c->records, SEGMENT_SIZE);
+	c->storage->base[MEM_BASE_IND]->handle = calloc(c->records, segmentSize());
+    assert(c->storage->base[MEM_BASE_IND]->handle && c->storage->base[MEM_BASE_IND]->header);
 	printf("size of %d allocated mem at %p\n", c->records * sizeOfRecord, c->storage->base[MEM_BASE_IND]->handle);
 	return 0;
 }
@@ -30,6 +50,14 @@ int memReadRecord(struct Container * c, struct Record * recordOut, unsigned int 
 
 int memWriteRecord(struct Container * c, struct Record * record)
 {
+    switch (memStorageStatus(c)) {
+    case MEM_STORAGE_OK:
+        break;
+    case MEM_STORAGE_FULL:
+        return MEM_STORAGE_FULL;
+        break;
+    }
+        
 	printf("size %d before realloc mem\n", c->records * sizeOfRecord);
 	memcpy(c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * (c->records-1), record, sizeOfRecord);
 	printf("size %d after realloc mem\n", c->records * sizeOfRecord);
