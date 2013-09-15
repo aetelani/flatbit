@@ -1,8 +1,10 @@
 #include <filestorage.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/types.h>
 #include <datacontainer.h>
 #include <storagebase.h>
+
 
 
 int fileStorageRemove(struct Container * container);
@@ -39,7 +41,7 @@ int fileStorageClose(struct Container * container)
 
 int fileStorageRemove(struct Container * container)
 {
-    int failed;
+    int failed = 1;
 
     if (!container->storage)
         return STORAGE_UNDEF;

@@ -19,8 +19,6 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef MEMSTORAGE_H
 #define MEMSTORAGE_H
 
-static const int MEM_BASE_IND = 1;
-
 struct Container;
 struct Record;
 struct Key;

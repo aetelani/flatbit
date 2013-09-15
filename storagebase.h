@@ -25,6 +25,9 @@ struct Container;
 struct Record;
 typedef void StorageHandle;
 
+static const int FILE_BASE_IND = 0;
+static const int MEM_BASE_IND = 1;
+
 struct StorageBase
 {
     StorageHandle * handle;
@@ -36,7 +39,5 @@ struct StorageBase
     unsigned int (*getIndex)(struct Container * container, struct Key * pk);
     int (*flush)(struct StorageBase * base);
 };
-
-static struct StorageBase fileStorage;
 
 #endif

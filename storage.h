@@ -55,8 +55,6 @@ struct Header {
 
 struct Header * makeHeader();
 
-static struct Header fbHeader = { .version = 1 };
-
 int keyCmp(struct Key * a, struct Key * b);
 
 unsigned int getIndex(struct Container * container, struct Key * pk);

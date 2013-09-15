@@ -4,7 +4,7 @@ add_executable(flatbit flatbit.c datacontainer.c storage.c storagepolicy.c files
 include_directories (${flatbit_SOURCE_DIR}) 
 
 SET (CMAKE_C_COMPILER             "/usr/bin/clang")
-#SET (CMAKE_C_FLAGS                "-Wall -std=c99")
+SET (CMAKE_C_FLAGS                "-Wall -std=c99")
 SET (CMAKE_C_FLAGS_DEBUG          "-g")
 SET (CMAKE_C_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
 SET (CMAKE_C_FLAGS_RELEASE        "-O4 -DNDEBUG")

@@ -115,11 +115,9 @@ int keyCmp(struct Key * a, struct Key * b)
 }
 
 unsigned int getIndex(struct Container * container, struct Key * pk)
-{   
-    int readBufferSize = 1;
-    struct Record rec; unsigned int index=0;
-    int readedValue;
-    assert(pk);
+{
+    unsigned int index=0;
+    assert(container && pk);
 
 	if (container->storage->base[MEM_BASE_IND])
 		index = container->storage->base[MEM_BASE_IND]->getIndex(container, pk);

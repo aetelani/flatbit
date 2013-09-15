@@ -16,7 +16,7 @@ enum MemStorageStatus {
     MEM_STORAGE_OK, MEM_STORAGE_FULL
 };
 
-const int segmentSize()
+const int segSize()
 {
     return maxNumberRecordsInSegment * sizeOfRecord;
 }
@@ -29,7 +29,7 @@ enum MemStorageStatus memStorageStatus(struct Container * c)
 int memStorageOpen(struct Container * c)
 {
 	c->storage->base[MEM_BASE_IND]->header = malloc(sizeOfHeader);
-	c->storage->base[MEM_BASE_IND]->handle = calloc(c->records, segmentSize());
+	c->storage->base[MEM_BASE_IND]->handle = calloc(c->records, segSize());
     assert(c->storage->base[MEM_BASE_IND]->handle && c->storage->base[MEM_BASE_IND]->header);
 	printf("size of %d allocated mem at %p\n", c->records * sizeOfRecord, c->storage->base[MEM_BASE_IND]->handle);
 	return 0;
