@@ -4,10 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+const int MAX_NUMBER_OF_RECORDS_IN_SEGMENT = 100;
+const int SEGMENT_SIZE = sizeOfRecord * MAX_NUMBER_OF_RECORDS_IN_SEGMENT;
+
 int memStorageOpen(struct Container * c)
 {
 	c->storage->base[MEM_BASE_IND]->header = malloc(sizeOfHeader);
-	c->storage->base[MEM_BASE_IND]->handle = calloc(c->records, sizeOfRecord);
+	c->storage->base[MEM_BASE_IND]->handle = calloc(c->records, SEGMENT_SIZE);
 	printf("size of %d allocated mem at %p\n", c->records * sizeOfRecord, c->storage->base[MEM_BASE_IND]->handle);
 	return 0;
 }
@@ -28,8 +31,6 @@ int memReadRecord(struct Container * c, struct Record * recordOut, unsigned int 
 int memWriteRecord(struct Container * c, struct Record * record)
 {
 	printf("size %d before realloc mem\n", c->records * sizeOfRecord);
-	void * mem = realloc(c->storage->base[MEM_BASE_IND]->handle, sizeOfRecord * ++c->records);
-	c->storage->base[MEM_BASE_IND]->handle = mem;
 	memcpy(c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * (c->records-1), record, sizeOfRecord);
 	printf("size %d after realloc mem\n", c->records * sizeOfRecord);
 	return 0;
