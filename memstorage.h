@@ -35,4 +35,6 @@ int memWriteHeader(struct Container *c);
 
 unsigned int memGetIndex(struct Container *c, struct Key * key);
 
+int memDelRecord(struct Container * c, unsigned int index);
+
 #endif

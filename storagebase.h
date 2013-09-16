@@ -37,6 +37,7 @@ struct StorageBase
     int (*open)(struct Container *container);
     int (*close)(struct Container *container);    
     unsigned int (*getIndex)(struct Container * container, struct Key * pk);
+    int (*delete)(struct Container *c, unsigned int index);
     int (*flush)(struct StorageBase * base);
 };
 

@@ -32,7 +32,7 @@ struct Data {
 };
 
 struct Record {
-	struct Key key;
+	struct Key * key;
 	struct Data data;
 };
 
@@ -54,12 +54,10 @@ static const int sizeOfHeader = sizeof(struct Header);
 
 struct Container * makeContainer(enum Policy s);
 
-int writeData(struct Container * container, struct Record * record);
+//struct Record * copyRecord(struct Record * r);
 
-struct Record * copyRecord(struct Record * r);
+//unsigned int getIndex(struct Container * container, struct Key * pk);
 
-unsigned int getIndex(struct Container * container, struct Key * pk);
-
-struct Data getData(struct Container * container, unsigned int ind);
+//struct Data getData(struct Container * container, unsigned int ind);
 
 #endif

@@ -35,7 +35,7 @@ int main()
     int recordCnt = 3;
     for (int i=0; i < recordCnt; i++)
     {
-        struct Key key = { .pk = i };
+        struct Key * key = calloc(1,sizeof(struct Key));
         struct Data data = { .data = i };
         struct Record rec = { .key = key, .data = data };
         writeData(c, &rec);
@@ -45,12 +45,13 @@ int main()
     for (int i=1; i < recordCnt; i++)
     {
         struct Key key = { .pk = i };
-        unsigned int index  = getIndex(c, &key);
+        unsigned int index  = c->storage->getIndex(c, &key);
         int res = -1;
         if (index)
         { 
 			printf("flatbit.c with index: %i\n", index);
 			res = c->storage->read(c, r, index);
+			c->storage->delete(c, index);
 		}
     }
     

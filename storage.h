@@ -42,6 +42,7 @@ struct Storage {
     int (*read)(struct Container *c, struct Record * recordOut, unsigned int index);
     int (*open)(struct Container *c);
     int (*close)(struct Container *c);
+    int (*delete)(struct Container *c, unsigned int index);
     unsigned int (*getIndex)(struct Container * container, struct Key * pk);    
 	struct StorageBase * base[STORAGE_MAX_COUNT];
     FBStorageStatus status;
@@ -58,5 +59,7 @@ struct Header * makeHeader();
 int keyCmp(struct Key * a, struct Key * b);
 
 unsigned int getIndex(struct Container * container, struct Key * pk);
+
+int writeData(struct Container * container, struct Record * record);
 
 #endif

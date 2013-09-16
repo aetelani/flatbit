@@ -26,6 +26,8 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 int storageRead(struct Container * container, struct Record * outRecord, unsigned int index);
 int storageClose(struct Container * container);
 int storageOpen(struct Container * container);
+unsigned int storageGetIndex(struct Container * container, struct Key * pk);
+int storageDelRecord(struct Container * c, unsigned int index);
 
 int storageOpen(struct Container * container)
 {
@@ -64,6 +66,8 @@ struct Storage * storageInit(struct Container * container)
 	container->storage->open = &storageOpen;
 	container->storage->close = &storageClose;
 	container->storage->read = &storageRead;
+	container->storage->getIndex = &storageGetIndex;
+	container->storage->delete = &storageDelRecord;	
 
 	switch (container->policy) {
 	case CONTAINER_STORAGE_FILE:
@@ -81,6 +85,7 @@ struct Storage * storageInit(struct Container * container)
 		container->storage->base[MEM_BASE_IND]->write = &memWriteRecord;
 		container->storage->base[MEM_BASE_IND]->read = &memReadRecord;
 		container->storage->base[MEM_BASE_IND]->getIndex = &memGetIndex;
+		container->storage->base[MEM_BASE_IND]->delete = &memDelRecord;
 		break;
 	}	
 
@@ -114,7 +119,7 @@ int keyCmp(struct Key * a, struct Key * b)
     return ret;
 }
 
-unsigned int getIndex(struct Container * container, struct Key * pk)
+unsigned int storageGetIndex(struct Container * container, struct Key * pk)
 {
     unsigned int index=0;
     assert(container && pk);
@@ -132,7 +137,7 @@ unsigned int getIndex(struct Container * container, struct Key * pk)
 int storageRead(struct Container * container, struct Record * outRecord, unsigned int index)
 {
 	printf("read: value with index: %i\n", index);
-	assert(container && outRecord && index);
+	assert(container && outRecord);
     int ret = 0;
     
 	if (container->storage->base[MEM_BASE_IND])
@@ -141,4 +146,18 @@ int storageRead(struct Container * container, struct Record * outRecord, unsigne
 		ret = container->storage->base[FILE_BASE_IND]->read(container, outRecord, index);
     
     return ret;
+}
+
+int storageDelRecord(struct Container * container, unsigned int index)
+{
+	printf("read: value with index: %i\n", index);
+	assert(container);
+    int ret = 0;
+
+	if (container->storage->base[MEM_BASE_IND])
+		ret = container->storage->base[MEM_BASE_IND]->delete(container, index);
+	else
+		ret = container->storage->base[FILE_BASE_IND]->delete(container, index);
+		
+	return ret;
 }
