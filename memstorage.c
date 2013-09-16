@@ -58,8 +58,7 @@ int memWriteRecord(struct Container * c, struct Record * record)
         break;
     }
         
-	printf("size %d before realloc mem\n", c->records * sizeOfRecord);
-	memcpy(c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * (c->records-1), record, sizeOfRecord);
+	memcpy(c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * (c->records++), record, sizeOfRecord);
 	printf("size %d after realloc mem\n", c->records * sizeOfRecord);
 	return 0;
 }
