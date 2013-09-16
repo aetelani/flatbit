@@ -38,11 +38,6 @@ struct Record {
 
 typedef unsigned int Index;
 
-struct IndexKey {
-	struct Key key;
-	unsigned int index;
-};
-
 enum Policy {
 	CONTAINER_STORAGE_FILE=1, CONTAINER_STORAGE_MEMORY=2
 };
@@ -52,7 +47,6 @@ struct Container {
 	enum Policy policy;
 	Index *index;
 	struct Storage * storage;
-	//change this to FBStorage and use storagebase for generic api for operations that use file apia tai mitä sitten tarviikaan.!!!!
 };
 
 static const int sizeOfRecord = sizeof(struct Record);
