@@ -37,14 +37,15 @@ int memStorageOpen(struct Container * c)
 
 int memStorageClose(struct Container * c)
 {	
-	free(c->storage->base[MEM_BASE_IND]->handle);
+	free(c->storage->base[MEM_BASE_IND]->handle); //oops should close Keys too if pointers
 	printf("size of %d free'd mem\n", c->records * sizeOfRecord);
 	return 0;
 }
 
 int memReadRecord(struct Container * c, struct Record * recordOut, unsigned int index)
 {
-	memcpy(recordOut, c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * index, sizeOfRecord);
+	//memcpy(recordOut, c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * index, sizeOfRecord);
+	recordOut = c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * index; //try without copy
 	return 0;
 }
 
@@ -52,6 +53,7 @@ int memDelRecord(struct Container * c, unsigned int index)
 {
 	struct Record * record;
 	record = c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * index;
+	free(record->key);
 	record->key = 0;
 	return 0;
 }
@@ -65,9 +67,12 @@ int memWriteRecord(struct Container * c, struct Record * record)
         return MEM_STORAGE_FULL;
         break;
     }
-        
+    
+    struct Record * r =  c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * c->records;
 	memcpy(c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * (c->records++), record, sizeOfRecord);
-	printf("size %d after realloc mem\n", c->records * sizeOfRecord);
+
+	printf("wrote key %d ", record->key->pk);
+	printf("records %d after write mem\n", c->records);
 	return 0;
 }
 

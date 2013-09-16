@@ -36,9 +36,10 @@ int main()
     for (int i=0; i < recordCnt; i++)
     {
         struct Key * key = calloc(1,sizeof(struct Key));
+        key->pk = i;
         struct Data data = { .data = i };
         struct Record rec = { .key = key, .data = data };
-        writeData(c, &rec);
+        c->storage->write(c, &rec);
     }
 
 	struct Record * r = malloc(sizeOfRecord);

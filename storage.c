@@ -28,6 +28,7 @@ int storageClose(struct Container * container);
 int storageOpen(struct Container * container);
 unsigned int storageGetIndex(struct Container * container, struct Key * pk);
 int storageDelRecord(struct Container * c, unsigned int index);
+int storageWrite(struct Container *container, struct Record *record);
 
 int storageOpen(struct Container * container)
 {
@@ -66,6 +67,7 @@ struct Storage * storageInit(struct Container * container)
 	container->storage->open = &storageOpen;
 	container->storage->close = &storageClose;
 	container->storage->read = &storageRead;
+	container->storage->write = &storageWrite;
 	container->storage->getIndex = &storageGetIndex;
 	container->storage->delete = &storageDelRecord;	
 
@@ -158,6 +160,19 @@ int storageDelRecord(struct Container * container, unsigned int index)
 		ret = container->storage->base[MEM_BASE_IND]->delete(container, index);
 	else
 		ret = container->storage->base[FILE_BASE_IND]->delete(container, index);
+		
+	return ret;
+}
+
+int storageWrite(struct Container *container, struct Record *record)
+{
+	assert(container && record);
+    int ret = 0;
+
+	if (container->storage->base[MEM_BASE_IND])
+		ret = container->storage->base[MEM_BASE_IND]->write(container, record);
+	else
+		ret = container->storage->base[FILE_BASE_IND]->write(container, record);
 		
 	return ret;
 }

@@ -58,8 +58,4 @@ struct Header * makeHeader();
 
 int keyCmp(struct Key * a, struct Key * b);
 
-unsigned int getIndex(struct Container * container, struct Key * pk);
-
-int writeData(struct Container * container, struct Record * record);
-
 #endif
