@@ -42,6 +42,10 @@ int main(int argc, char *argv[])
 		map[i] = 2 * i;
     }
 
+    for (i = 1; i <=NUMINTS; ++i) {
+		printf("reading mmap: %d: %d\n", i, map[i]);
+    }
+
     munmap(map, FILESIZE);
 	perror("Unmapping");
 	
