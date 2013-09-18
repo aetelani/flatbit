@@ -8,8 +8,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <netinet/in.h>
-#include <X11/Xpoll.h>
+#include <string.h>
 
 #define SERVER_PORT  12345
 
@@ -25,7 +24,7 @@ main (int argc, char *argv[])
    char   buffer[80];
    struct sockaddr_in   addr;
    struct timeval       timeout;
-   struct fd_set   master_set, working_set;
+   fd_set   master_set, working_set;
 
    /*************************************************************/
    /* Create an AF_INET stream socket to receive incoming       */
@@ -93,9 +92,9 @@ main (int argc, char *argv[])
    /*************************************************************/
    /* Initialize the master fd_set                              */
    /*************************************************************/
-   FD_ZERO(master_set);
+   FD_ZERO(&master_set);
    max_sd = listen_sd;
-   FD_SET(listen_sd, master_set);
+   FD_SET(listen_sd, &master_set);
 
    /*************************************************************/
    /* Initialize the timeval struct to 3 minutes.  If no        */
@@ -113,8 +112,7 @@ main (int argc, char *argv[])
       /**********************************************************/
       /* Copy the master fd_set over to the working fd_set.     */
       /**********************************************************/
-	FD_COPY(&working_set, &master_set);
-      //memcpy(working_set, master_set, sizeof(master_set));
+      memcpy(&working_set, &master_set, sizeof(master_set));
 
       /**********************************************************/
       /* Call select() and wait 5 minutes for it to complete.   */
