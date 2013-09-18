@@ -38,12 +38,12 @@ typedef enum
 struct StorageBase;
 struct Storage {
 	const char * id;
-    int (*write)(struct Container *c, struct Record *record);
-    int (*read)(struct Container *c, struct Record * recordOut, unsigned int index);
-    int (*open)(struct Container *c);
-    int (*close)(struct Container *c);
-    int (*delete)(struct Container *c, unsigned int index);
-    unsigned int (*getIndex)(struct Container * container, struct Key * pk);    
+    int (*write)(struct Container * restrict c, struct Record *record);
+    int (*read)(struct Container * restrict c, struct Record * recordOut, unsigned int index);
+    int (*open)(struct Container * restrict c);
+    int (*close)(struct Container * restrict c);
+    int (*delete)(struct Container * restrict c, unsigned int index);
+    unsigned int (*getIndex)(struct Container * restrict c, struct Key * pk);    
 	struct StorageBase * base[STORAGE_MAX_COUNT];
     FBStorageStatus status;
 };

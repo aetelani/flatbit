@@ -1,86 +1,46 @@
-/**************************************************************************/
-/* Generic client example is used with connection-oriented server designs */
-/**************************************************************************/
 #include <stdio.h>
-#include <stdlib.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
-#include <string.h>
 
-#define SERVER_PORT  12345
+#define PORT_NO 3033
+#define BUFFER_SIZE 1024
 
-main (int argc, char *argv[])
+int main()
 {
-   int    len, rc;
-   int    sockfd;
-   char   send_buf[80];
-   char   recv_buf[80];
-   struct sockaddr_in   addr;
+int sd;
+struct sockaddr_in addr;
+int addr_len = sizeof(addr);
+char buffer[BUFFER_SIZE] = "";
 
-   /*************************************************/
-   /* Create an AF_INET stream socket               */
-   /*************************************************/
-   sockfd = socket(AF_INET, SOCK_STREAM, 0);
-   if (sockfd < 0)
-   {
-      perror("socket");
-      exit(-1);
-   }
+// Create client socket
+if( (sd = socket(PF_INET, SOCK_STREAM, 0)) < 0 )
+{
+  perror("socket error");
+  return -1;
+}
 
-   /*************************************************/
-   /* Initialize the socket address structure       */
-   /*************************************************/
-   memset(&addr, 0, sizeof(addr));
-   addr.sin_family      = AF_INET;
-   addr.sin_addr.s_addr = htonl(INADDR_ANY);
-   addr.sin_port        = htons(SERVER_PORT);
+bzero(&addr, sizeof(addr));
 
-   /*************************************************/
-   /* Connect to the server                         */
-   /*************************************************/
-   rc = connect(sockfd,
-                (struct sockaddr *)&addr,
-                sizeof(struct sockaddr_in));
-   if (rc < 0)
-   {
-      perror("connect");
-      close(sockfd);
-      exit(-1);
-   }
-   printf("Connect completed.\n");
+addr.sin_family = AF_INET;
+addr.sin_port = htons(PORT_NO);
+addr.sin_addr.s_addr =  htonl(INADDR_ANY);
 
-   /*************************************************/
-   /* Enter data buffer that is to be sent          */
-   /*************************************************/
-   printf("Enter message to be sent:\n");
-   gets(send_buf);
+// Connect to server socket
+if(connect(sd, (struct sockaddr *)&addr, sizeof addr) < 0)
+{
+  perror("Connect error");
+  return -1;
+}
 
-   /*************************************************/
-   /* Send data buffer to the worker job            */
-   /*************************************************/
-   len = send(sockfd, send_buf, strlen(send_buf) + 1, 0);
-   if (len != strlen(send_buf) + 1)
-   {
-      perror("send");
-      close(sockfd);
-      exit(-1);
-   }
-   printf("%d bytes sent\n", len);
+while (strcmp(buffer, "q") != 0)
+{
+  // Read input from user and send message to the server
+  gets(buffer);
+  send(sd, buffer, strlen(buffer), 0);
 
-   /*************************************************/
-   /* Receive data buffer from the worker job       */
-   /*************************************************/
-   len = recv(sockfd, recv_buf, sizeof(recv_buf), 0);
-   if (len != strlen(send_buf) + 1)
-   {
-      perror("recv");
-      close(sockfd);
-      exit(-1);
-   }
-   printf("%d bytes received\n", len);
+  // Receive message from the server
+  recv(sd, buffer, BUFFER_SIZE, 0);
+  printf("message: %s\n", buffer);
+}
 
-   /*************************************************/
-   /* Close down the socket                         */
-   /*************************************************/
-   close(sockfd);
+return 0;
 }

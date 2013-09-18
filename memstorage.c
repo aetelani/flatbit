@@ -67,13 +67,12 @@ int memWriteRecord(struct Container * c, struct Record * record)
         return MEM_STORAGE_FULL;
         break;
     }
-    
-    struct Record * r =  c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * c->records;
-	memcpy(c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * (c->records++), record, sizeOfRecord);
+        
+	struct Record * r = memcpy(c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * (c->records++), record, sizeOfRecord);
 
-	printf("wrote key %d ", record->key->pk);
+	printf("wrote key %d ", r->key->pk);
 	printf("records %d after write mem\n", c->records);
-	return 0;
+	return MEM_STORAGE_OK;
 }
 
 int memWriteHeader(struct Container * c)
