@@ -4,12 +4,35 @@
 #define PORT_NO 3033
 #define BUFFER_SIZE 1024
 
+struct Key {
+	int pk;
+};
+
+struct Data {
+	int data;
+};
+
+struct Record {
+	struct Key * key;
+	struct Data data;
+};
+
+struct Operation {
+	int op;
+	struct Record record;
+};
+
 int main()
 {
 int sd;
 struct sockaddr_in addr;
 int addr_len = sizeof(addr);
 char buffer[BUFFER_SIZE] = "";
+struct Operation op;
+
+op.record.key = malloc(sizeof(struct Key));
+op.record.data.data = 1;
+
 
 // Create client socket
 if( (sd = socket(PF_INET, SOCK_STREAM, 0)) < 0 )
@@ -35,7 +58,8 @@ while (strcmp(buffer, "q") != 0)
 {
   // Read input from user and send message to the server
   gets(buffer);
-  send(sd, buffer, strlen(buffer), 0);
+  //send(sd, buffer, strlen(buffer), 0);
+  send(sd, &op, sizeof(struct Operation), 0);
 
   // Receive message from the server
   recv(sd, buffer, BUFFER_SIZE, 0);

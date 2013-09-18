@@ -32,6 +32,11 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #define PORT_NO 3033
 #define BUFFER_SIZE 1024
 
+struct Operation {
+	int op;
+	struct Record record;
+};
+
 int total_clients = 0;  // Total number of connected clients
 
 void accept_cb(struct ev_loop *loop, struct ev_io *watcher, int revents);
@@ -118,7 +123,7 @@ void accept_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 /* Read client message */
 void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 {
-	char buffer[BUFFER_SIZE];
+	struct Operation * buffer = malloc(sizeof(struct Operation));
 	ssize_t read;
 
 	if(EV_ERROR & revents)
@@ -148,7 +153,7 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 	}
 	else
 	{
-	  printf("message:%s\n",buffer);
+	  printf("operation:%d\n", buffer->record.data.data);
 	}
 
 	// Send message bach to the client
@@ -163,6 +168,7 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 
 int main()
 {
+	startEV();
 	enum Policy policy = CONTAINER_STORAGE_MEMORY;
 	
     struct Container *c = makeContainer(policy);
