@@ -10,6 +10,7 @@ SET (CMAKE_C_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
 SET (CMAKE_C_FLAGS_RELEASE        "-O4 -DNDEBUG")
 SET (CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g")
 
+target_link_libraries(flatbit -lev)
 
 configure_file (
   "${PROJECT_SOURCE_DIR}/flatbitconfig.h.in"
