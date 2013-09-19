@@ -30,12 +30,12 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <strings.h>
 
 #define PORT_NO 3033
-#define BUFFER_SIZE 1024
 
 struct Operation {
 	int op;
 	struct Record record;
 };
+#define BUFFER_SIZE sizeof(struct Operation)
 
 int total_clients = 0;  // Total number of connected clients
 
@@ -103,12 +103,7 @@ void accept_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 
 	// Accept client request
 	client_sd = accept(watcher->fd, (struct sockaddr *)&client_addr, &client_len);
-
-	if (client_sd < 0)
-	{
-	  perror("accept error");
-	  return;
-	}
+	perror("connection accepted");
 
 	total_clients ++; // Increment total_clients count
 	printf("%d client(s) connected.\n", total_clients);
@@ -133,6 +128,7 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 	// Receive message from client socket
 	read = recv(watcher->fd, buffer, BUFFER_SIZE, 0);
 
+	assert(read > 0);
 	if(read < 0)
 	{
 	  perror("read error");
@@ -143,7 +139,7 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 	  // Stop and free watchet if client socket is closing
 	  ev_io_stop(loop,watcher);
 	  free(watcher);
-	  perror("peer might closing");
+	  perror("peer might closing");	  
 	  total_clients --; // Decrement total_clients count
 	  printf("%d client(s) connected.\n", total_clients);
 	  return;
