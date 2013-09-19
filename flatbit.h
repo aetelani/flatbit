@@ -26,5 +26,13 @@ enum StorageOpenMode {
 	FILE_OPEN_WAL, FILE_OPEN_DIRECT
 };
 
+enum FBInterface {
+	FB_WRITE, FB_READ, FB_DELETE
+};
+
+enum FBType {
+	FB_KEY = 1, FB_DATA = 2, FB_INDEX = 4
+};
+
 
 //void impFBSetHandle(FILE*h) {}

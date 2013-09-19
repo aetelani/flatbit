@@ -111,7 +111,6 @@ void accept_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 	}
 
 	total_clients ++; // Increment total_clients count
-	printf("Successfully connected with client.\n");
 	printf("%d client(s) connected.\n", total_clients);
 
 	// Initialize and start watcher to read client requests
@@ -138,9 +137,8 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 	{
 	  perror("read error");
 	  return;
-	}
-
-	if(read == 0)
+	  
+	} else if(read == 0)
 	{
 	  // Stop and free watchet if client socket is closing
 	  ev_io_stop(loop,watcher);
@@ -149,8 +147,8 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 	  total_clients --; // Decrement total_clients count
 	  printf("%d client(s) connected.\n", total_clients);
 	  return;
-	}
-	else
+	  
+	} else
 	{
 	  printf("operation:%d\n", buffer->record.data.data);
 	}
@@ -168,41 +166,9 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 int main()
 {
 	startEV();
-	enum Policy policy = CONTAINER_STORAGE_MEMORY;
-	
+	enum Policy policy = CONTAINER_STORAGE_MEMORY;	
     struct Container *c = makeContainer(policy);
     c->storage->open(c);
-
-    int recordCnt = 3;
-    for (int i=0; i < recordCnt; i++)
-    {
-        struct Data td = { .data = i };
-        struct Key tk = { .pk = i };
-        struct Record rec = { .key = tk, .data = td };
-        c->storage->write(c, &rec);
-    }
-
-	struct Record * r = malloc(sizeOfRecord);
-    for (int i=1; i < recordCnt; i++)
-    {
-        struct Key key = { .pk = i };
-        unsigned int index  = c->storage->getIndex(c, &key);
-        int res = -1;
-        if (index)
-        { 
-			printf("flatbit.c with index: %i\n", index);
-			res = c->storage->read(c, r, index);
-			c->storage->delete(c, index);
-		}
-    }
-    
-    if (c)
-    {
-        //printf("Records: %i\n", c->records);
-        //printf("Founded index: %i\n", index);
-        //printf("Data digged:%i", d.data);
-    } else
-        printf("Failed miserably\n");
 
     return 0;
 }

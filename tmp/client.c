@@ -2,11 +2,12 @@
 #include <netinet/in.h>
 #include <strings.h>
 #include <datacontainer.h>
+#include <flatbit.h>
 
 #define PORT_NO 3033
 
-struct Operation {
-	int op;
+struct Flatbit {
+	enum FBInterface op;
 	struct Record record;
 };
 
@@ -15,11 +16,7 @@ int main()
 	int sd;
 	struct sockaddr_in addr;
 	int addr_len = sizeof(addr);
-	struct Operation op;
-
-	op.record.key.pk = 1;
-	op.record.data.data = 1;
-
+	struct Flatbit backend;
 
 	// Create client socket
 	if( (sd = socket(PF_INET, SOCK_STREAM, 0)) < 0 )
@@ -39,8 +36,41 @@ int main()
 	  perror("Connect error");
 	  return -1;
 	}
-	
-	send(sd, &op, sizeof(struct Operation), 0);
+
+    const int recordCnt = 3;
+    for (int i=0; i < recordCnt; i++)
+    {
+        struct Data td = { .data = i };
+        struct Key tk = { .pk = i };
+        struct Record rec = { .key = tk, .data = td };
+//        c->storage->write(c, &rec);
+		backend.op = FB_WRITE;
+		backend.record.data = td;
+		backend.record.key = tk;
+		backend.record.status = FB_KEY | FB_DATA;
+		
+        send(sd, &backend, sizeof(struct Flatbit), 0);
+    }
+
+    for (int i=1; i < recordCnt; i++)
+    {
+        struct Key key = { .pk = i };
+//        unsigned int index  = c->storage->getIndex(c, &key);
+        int res = -1;
+        if (index)
+        { 
+//			printf("flatbit.c with index: %i\n", index);
+			backend.op = FB_READ;
+			send(sd, &backend, sizeof(struct Flatbit), 0);
+			//res = c->storage->read(c, r, index);
+			
+			backend.op = FB_DELETE;
+			backend.record.status = FB_KEY;
+			backend.record.key = key;
+			send(sd, &backend, sizeof(struct Flatbit), 0);
+//			c->storage->delete(c, index);
+		}
+    }
 
 	return 0;
 }
