@@ -24,7 +24,7 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <memstorage.h>
 #include <assert.h>
 
-static const int STORAGE_MAX_COUNT = 4;
+#define STORAGE_MAX_COUNT 4
 
 typedef enum {
     STORAGE_UNDEF=-1, STORAGE_OPEN=0, STORAGE_CLOSED, STORAGE_REMOVED

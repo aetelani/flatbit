@@ -1,21 +1,9 @@
 #include <stdio.h>
 #include <netinet/in.h>
+#include <strings.h>
+#include <datacontainer.h>
 
 #define PORT_NO 3033
-#define BUFFER_SIZE 1024
-
-struct Key {
-	int pk;
-};
-
-struct Data {
-	int data;
-};
-
-struct Record {
-	struct Key key;
-	struct Data data;
-};
 
 struct Operation {
 	int op;
@@ -29,7 +17,7 @@ int main()
 	int addr_len = sizeof(addr);
 	struct Operation op;
 
-	op.record.key = malloc(sizeof(struct Key));
+	op.record.key.pk = 1;
 	op.record.data.data = 1;
 
 
