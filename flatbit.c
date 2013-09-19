@@ -154,8 +154,8 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 	}
 
 	// Send message bach to the client
-	send(watcher->fd, buffer, read, 0);
-	bzero(buffer, read);
+//	send(watcher->fd, buffer, read, 0);
+//	bzero(buffer, read);
 }
 
 
@@ -165,10 +165,9 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 
 int main()
 {
-	startEV();
-	enum Policy policy = CONTAINER_STORAGE_MEMORY;	
-    struct Container *c = makeContainer(policy);
+    struct Container *c = makeContainer(CONTAINER_STORAGE_MEMORY);
     c->storage->open(c);
+	startEV();
 
     return 0;
 }
