@@ -53,8 +53,7 @@ int memDelRecord(struct Container * c, unsigned int index)
 {
 	struct Record * record;
 	record = c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * index;
-	free(record->key);
-	record->key = 0;
+	record->status = 0;
 	return 0;
 }
 
@@ -69,8 +68,9 @@ int memWriteRecord(struct Container * c, struct Record * record)
     }
         
 	struct Record * r = memcpy(c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * (c->records++), record, sizeOfRecord);
+	record->status = 1;
 
-	printf("wrote key %d ", r->key->pk);
+	printf("wrote key %d ", r->key.pk);
 	printf("records %d after write mem\n", c->records);
 	return MEM_STORAGE_OK;
 }
@@ -84,13 +84,14 @@ int memWriteHeader(struct Container * c)
 
 unsigned int memGetIndex(struct Container * c, struct Key * key)
 {
-	struct Record rec; unsigned int index=0;
+	struct Record rec;
+	unsigned int index=0;
+
 	for (; index <= c->records; index++)
 	{
 		memcpy(&rec, c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * index, sizeOfRecord);
-		//printf("getIndex, index %i, pk:%i, rec.pk:%i", index, key->pk, (&rec).key.pk);
-		//printf(" dataoffsetptr %p, with offset:%i\n",c->storage->base[MEM_BASE_IND]->handle + sizeOfRecord * index, sizeOfRecord * index);
-		if (keyCmp((&rec)->key, key))
+
+		if (keyCmp(&(rec.key), key))
 		{
 			printf("found pk match\n");
 			return index;

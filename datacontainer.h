@@ -32,10 +32,12 @@ struct Data {
 };
 
 struct Record {
-	struct Key * key;
+	struct Key key;
 	struct Data data;
+	int status; // per record info, such as null. overhead but works for now.
 };
 
+struct Indexi { int ind; };
 typedef unsigned int Index;
 
 enum Policy {

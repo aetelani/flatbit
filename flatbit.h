@@ -17,10 +17,8 @@ You should have received a copy of the GNU General Public License
 along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FLATBIT_H
-#define FLATBIT_H
+#pragma once
 
-//#include <stdio.h>
 #include <assert.h>
 
 enum StorageOpenMode {
@@ -30,5 +28,3 @@ enum StorageOpenMode {
 
 
 //void impFBSetHandle(FILE*h) {}
-
-#endif

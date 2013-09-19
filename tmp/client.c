@@ -13,7 +13,7 @@ struct Data {
 };
 
 struct Record {
-	struct Key * key;
+	struct Key key;
 	struct Data data;
 };
 
@@ -24,47 +24,35 @@ struct Operation {
 
 int main()
 {
-int sd;
-struct sockaddr_in addr;
-int addr_len = sizeof(addr);
-char buffer[BUFFER_SIZE] = "";
-struct Operation op;
+	int sd;
+	struct sockaddr_in addr;
+	int addr_len = sizeof(addr);
+	struct Operation op;
 
-op.record.key = malloc(sizeof(struct Key));
-op.record.data.data = 1;
+	op.record.key = malloc(sizeof(struct Key));
+	op.record.data.data = 1;
 
 
-// Create client socket
-if( (sd = socket(PF_INET, SOCK_STREAM, 0)) < 0 )
-{
-  perror("socket error");
-  return -1;
-}
+	// Create client socket
+	if( (sd = socket(PF_INET, SOCK_STREAM, 0)) < 0 )
+	{
+	  perror("socket error");
+	  return -1;
+	}
 
-bzero(&addr, sizeof(addr));
+	bzero(&addr, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(PORT_NO);
+	addr.sin_addr.s_addr =  htonl(INADDR_ANY);
 
-addr.sin_family = AF_INET;
-addr.sin_port = htons(PORT_NO);
-addr.sin_addr.s_addr =  htonl(INADDR_ANY);
+	// Connect to server socket
+	if(connect(sd, (struct sockaddr *)&addr, sizeof addr) < 0)
+	{
+	  perror("Connect error");
+	  return -1;
+	}
+	
+	send(sd, &op, sizeof(struct Operation), 0);
 
-// Connect to server socket
-if(connect(sd, (struct sockaddr *)&addr, sizeof addr) < 0)
-{
-  perror("Connect error");
-  return -1;
-}
-
-while (strcmp(buffer, "q") != 0)
-{
-  // Read input from user and send message to the server
-  gets(buffer);
-  //send(sd, buffer, strlen(buffer), 0);
-  send(sd, &op, sizeof(struct Operation), 0);
-
-  // Receive message from the server
-  recv(sd, buffer, BUFFER_SIZE, 0);
-  printf("message: %s\n", buffer);
-}
-
-return 0;
+	return 0;
 }

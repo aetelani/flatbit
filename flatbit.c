@@ -47,7 +47,6 @@ int startEV()
 	struct ev_loop *loop = ev_default_loop(0);
 	int sd;
 	struct sockaddr_in addr;
-	int addr_len = sizeof(addr);
 	struct ev_io w_accept;
 
 	// Create server socket
@@ -177,10 +176,9 @@ int main()
     int recordCnt = 3;
     for (int i=0; i < recordCnt; i++)
     {
-        struct Key * key = calloc(1,sizeof(struct Key));
-        key->pk = i;
-        struct Data data = { .data = i };
-        struct Record rec = { .key = key, .data = data };
+        struct Data td = { .data = i };
+        struct Key tk = { .pk = i };
+        struct Record rec = { .key = tk, .data = td };
         c->storage->write(c, &rec);
     }
 

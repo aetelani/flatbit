@@ -92,7 +92,7 @@ Index fileGetIndex(struct Container * container, struct Key * pk)
         printf("seekTo %i, ind:%i\n", seekTo, index);
         readedValue = fread(&rec, sizeof(struct Record), readBufferSize, container->storage->base[FILE_BASE_IND]->handle); //mmap/read might be better
         
-        if (keyCmp(rec.key, pk))
+        if (keyCmp(&rec.key, pk))
 		{
             printf("found pk match\n");
             break;
