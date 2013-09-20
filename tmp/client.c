@@ -50,6 +50,7 @@ int main()
 		backend.record.status = FB_KEY | FB_DATA;
 		
         send(sd, &backend, sizeof(struct Flatbit), 0);
+        perror("send write op");
     }
 
     for (int i=1; i < recordCnt; i++)
@@ -62,12 +63,14 @@ int main()
 //			printf("flatbit.c with index: %i\n", index);
 			backend.op = FB_READ;
 			send(sd, &backend, sizeof(struct Flatbit), 0);
+			perror("send read op");
 			//res = c->storage->read(c, r, index);
 			
 			backend.op = FB_DELETE;
 			backend.record.status = FB_KEY;
 			backend.record.key = key;
 			send(sd, &backend, sizeof(struct Flatbit), 0);
+			perror("send delete op");
 //			c->storage->delete(c, index);
 		}
     }

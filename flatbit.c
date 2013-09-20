@@ -128,7 +128,6 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 	// Receive message from client socket
 	read = recv(watcher->fd, buffer, BUFFER_SIZE, 0);
 
-	assert(read > 0);
 	if(read < 0)
 	{
 	  perror("read error");
