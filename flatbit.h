@@ -28,11 +28,12 @@ enum StorageOpenMode {
 };
 
 enum FBInterface {
-	FB_WRITE, FB_READ, FB_DELETE, FB_RESPONSE_OK, FB_RESPONSE_FAILED, FB_RESPONSE_DATA_OK
+	FB_WRITE, FB_READ, FB_DELETE, FB_RESPONSE_OK
 };
 
 enum FBType {
-	FB_KEY = 1, FB_DATA = 2, FB_INDEX = 4
+	FB_EMPTY = 0, FB_KEY = 1, FB_DATA = 2, FB_INDEX = 4,
+	FB_FULL = FB_KEY | FB_DATA | FB_INDEX
 };
 
 struct Flatbit {

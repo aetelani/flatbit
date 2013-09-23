@@ -126,7 +126,7 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 
 	if(read < 0)
 	{
-	  perror("read error");
+	  //perror("read error"); //partial read
 	  return;
 	  
 	} else if(read == 0)
