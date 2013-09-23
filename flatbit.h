@@ -20,6 +20,7 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <assert.h>
+#include <datacontainer.h>
 
 enum StorageOpenMode {
 	FILE_CLOSED, FILE_OPEN_EXCLUSIVE, FILE_OPEN_SHARED,
@@ -27,11 +28,16 @@ enum StorageOpenMode {
 };
 
 enum FBInterface {
-	FB_WRITE, FB_READ, FB_DELETE
+	FB_WRITE, FB_READ, FB_DELETE, FB_RESPONSE_OK, FB_RESPONSE_FAILED, FB_RESPONSE_DATA_OK
 };
 
 enum FBType {
 	FB_KEY = 1, FB_DATA = 2, FB_INDEX = 4
+};
+
+struct Flatbit {
+	enum FBInterface op;
+	struct Record record;
 };
 
 

@@ -31,10 +31,6 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 
 #define PORT_NO 3033
 
-struct Operation {
-	int op;
-	struct Record record;
-};
 #define BUFFER_SIZE sizeof(struct Operation)
 
 int total_clients = 0;  // Total number of connected clients
@@ -93,7 +89,7 @@ void accept_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 	struct sockaddr_in client_addr;
 	socklen_t client_len = sizeof(client_addr);
 	int client_sd;
-	struct ev_io *w_client = (struct ev_io*) malloc (sizeof(struct ev_io));
+	struct ev_io *w_client = malloc (sizeof(struct ev_io));
 
 	if(EV_ERROR & revents)
 	{
@@ -116,7 +112,7 @@ void accept_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 /* Read client message */
 void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 {
-	struct Operation * buffer = malloc(sizeof(struct Operation));
+	struct Flatbit * buffer = malloc(sizeof(struct Flatbit));
 	ssize_t read;
 
 	if(EV_ERROR & revents)
@@ -126,7 +122,7 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 	}
 
 	// Receive message from client socket
-	read = recv(watcher->fd, buffer, BUFFER_SIZE, 0);
+	read = recv(watcher->fd, buffer, sizeof(struct Flatbit), 0);
 
 	if(read < 0)
 	{
@@ -145,17 +141,21 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 	  
 	} else
 	{
-	  printf("operation:%d\n", buffer->record.data.data);
-	}
+		printf("operation:%d\n", buffer->record.data.data);
 
-	// Send message bach to the client
-//	send(watcher->fd, buffer, read, 0);
-//	bzero(buffer, read);
+		//Send response back
+		struct Flatbit * response = malloc(sizeof(struct Flatbit));
+		response->op = FB_RESPONSE_DATA_OK;
+		int ret = send(watcher->fd, response, sizeof(struct Flatbit), 0);
+		close(watcher->fd);
+		bzero(buffer, read);
+		printf("send response back, success: %d.\n", !!ret);
+	}
 }
 
 
 
-//!TODO multitable, multifile, abstract file & format
+//!TODO too much. multitable, multifile, abstract file & format
 // Init File actually, one table, one file for now.
 
 int main()

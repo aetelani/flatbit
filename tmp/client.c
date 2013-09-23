@@ -1,15 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <netinet/in.h>
 #include <strings.h>
 #include <datacontainer.h>
 #include <flatbit.h>
 
 #define PORT_NO 3033
-
-struct Flatbit {
-	enum FBInterface op;
-	struct Record record;
-};
 
 int main()
 {
@@ -64,6 +61,12 @@ int main()
 			backend.op = FB_READ;
 			send(sd, &backend, sizeof(struct Flatbit), 0);
 			perror("send read op");
+			/*****/
+			struct Flatbit * buffer = malloc(sizeof(struct Flatbit));
+			ssize_t read = recv(sd, buffer, sizeof(struct Flatbit), 0);
+			printf("read op:%d \n", buffer->op);
+			//send(sd, buffer, sizeof(struct Operation), 0);
+			/*******/
 			//res = c->storage->read(c, r, index);
 			
 			backend.op = FB_DELETE;
@@ -74,6 +77,7 @@ int main()
 //			c->storage->delete(c, index);
 		}
     }
+    close(sd);
 
 	return 0;
 }
