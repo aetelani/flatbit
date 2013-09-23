@@ -10,7 +10,7 @@ static char *request(const char *url)
     CURLcode status;
     long code;
 
-    curl = curl_easy_init(););
+    curl = curl_easy_init();
 
 
     curl_easy_setopt(curl, CURLOPT_URL, url);
