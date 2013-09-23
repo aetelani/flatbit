@@ -22,7 +22,7 @@ along with FlatBit.  If not, see <http://www.gnu.org/licenses/>.
 #include <storage.h>
 #include <stdlib.h>
 #include <ev.h>
-
+#include <unistd.h>
 #include <stdio.h>
 #include <netinet/in.h>
 #include <ev.h>
@@ -126,12 +126,12 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 
 	if(read < 0)
 	{
-	  //perror("read error"); //partial read
+	  perror("read error"); //partial read. fix this
 	  return;
 	  
 	} else if(read == 0)
 	{
-	  // Stop and free watchet if client socket is closing
+	  // Stop and free watcher if client socket is closing
 	  ev_io_stop(loop,watcher);
 	  free(watcher);
 	  perror("peer might closing");	  
@@ -145,9 +145,9 @@ void read_cb(struct ev_loop *loop, struct ev_io *watcher, int revents)
 
 		//Send response back
 		struct Flatbit * response = malloc(sizeof(struct Flatbit));
-		response->op = FB_RESPONSE_DATA_OK;
+		response->op = FB_RESPONSE_OK;
+		response->record.status = FB_RECORD_FULL;
 		int ret = send(watcher->fd, response, sizeof(struct Flatbit), 0);
-		close(watcher->fd);
 		bzero(buffer, read);
 		printf("send response back, success: %d.\n", !!ret);
 	}

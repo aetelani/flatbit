@@ -33,7 +33,7 @@ enum FBInterface {
 
 enum FBType {
 	FB_EMPTY = 0, FB_KEY = 1, FB_DATA = 2, FB_INDEX = 4,
-	FB_FULL = FB_KEY | FB_DATA | FB_INDEX
+	FB_RECORD_FULL = FB_KEY | FB_DATA | FB_INDEX
 };
 
 struct Flatbit {
