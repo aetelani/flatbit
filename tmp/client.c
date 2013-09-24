@@ -84,6 +84,21 @@ static char *request(const char *url)
     return write_result.data;
 }
 
+int print_keys(json_t * obj)
+{
+	const char *key;
+	json_t *value;
+	void * iter = json_object_iter(obj);
+	while(iter)
+	{
+		key = json_object_iter_key(iter);
+		value = json_object_iter_value(iter);
+		printf("Object Key: %s \n", key);
+		iter = json_object_iter_next(obj, iter);
+	}
+	return json_object_size(obj);
+}
+
 int parse_json()
 {
 	size_t i;
@@ -93,7 +108,8 @@ int parse_json()
 	json_t *root;
 	json_error_t error;
 
-	text = request("https://api.github.com/repos/aetelani/flatbit/commits");
+//	text = request("https://api.github.com/repos/aetelani/flatbit/commits");
+	text = request("http://localhost/bitson_ex1.bitson");
 	if(!text)
 		return 1;
 
@@ -106,26 +122,24 @@ int parse_json()
         return 1;
     }
 
-	json_t *data, *sha, *commit, *message;
-	const char *message_text;
-	for(i = 0; i < json_array_size(root); i++)
-	{		
-		data = json_array_get(root, i);
-		assert(json_is_object(data));
+//	json_t *data, *sha, *commit, *message;
 
+	print_keys(root);
+	
+	const char *message_text;
+	for(i = 0; i < json_object_size(root); i++)
+	{	
+/*		data = json_array_get(root, i);
+		assert(json_is_object(data));
 		sha = json_object_get(data, "sha");
 		assert(json_is_string(sha));
-
 		commit = json_object_get(data, "commit");
 		assert(json_is_object(commit));
-
 		message = json_object_get(commit, "message");
 		assert(json_is_string(message));		
-
 		message_text = json_string_value(message);
 		assert(message_text);		
-
-		printf("%.8s %.*s\n", json_string_value(sha), newline_offset(message_text), message_text);
+		printf("%.8s %.*s\n", json_string_value(sha), newline_offset(message_text), message_text);*/
 	}
 
 	json_decref(root);

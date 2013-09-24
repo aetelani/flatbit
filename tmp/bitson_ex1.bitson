@@ -1,0 +1,7 @@
+{
+	"_visual_type":
+	{
+		"small": {"x":0, "y":0, "w":100, "h":100, "bmap": ["url://"], "fun":["url://"]},
+		"big": {"ref":"_visual_type.small", "info":"not supported"}
+	}
+}

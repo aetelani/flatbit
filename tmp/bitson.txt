@@ -1,6 +1,7 @@
 bitson ~ a bit of syntax object notation
 
-control-key		= "_" string
+control-key		= "visual_type" ; / ...
+control-string	= "_" 1*control-key
 option-key		= string
 value-op		= value
 value-key 		= option-key ":" value-op
