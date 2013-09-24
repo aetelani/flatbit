@@ -1,0 +1,23 @@
+bitson ~ a bit of syntax object notation
+
+control-key		= "_" string
+option-key		= string
+value-op		= value
+value-key 		= option-key ":" value-op
+value-object	= begin-object 1*value-key end-object
+
+
+example:
+{
+	"_visual_type":
+	{
+		"small": {"x":0, "y":0, "w":100, "h":100, "bmap": ["url://"], "fun":["url://"]},
+		"big": {"ref":"_visual_type.small", "info":"not supported"}
+	},
+	...
+}
+
+
+ref.
+http://www.ietf.org/rfc/rfc4627.txt
+http://www.ietf.org/rfc/rfc4234.txt
