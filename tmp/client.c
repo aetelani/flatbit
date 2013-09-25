@@ -130,7 +130,7 @@ int print_keys(json_t * obj, enum key_type parentCtx)
 				printf(": %i", (int)json_integer_value(value));
 				break;
 		case JSON_REAL:
-				printf(": %i", (int)json_number_value(value));
+				printf(": %f", (int)json_number_value(value));
 				break;
 		case JSON_ARRAY:
 				printf(": [...]");
