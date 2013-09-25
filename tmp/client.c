@@ -83,28 +83,43 @@ static char *request(const char *url)
 
     return write_result.data;
 }
-
+int struct_depth = 0;
 int print_keys(json_t * obj)
 {
 	const char *key;
 	json_t *value;
-	void * iter = json_object_iter(obj);
+	void * iter = json_object_iter(obj);	
 	while(iter)
 	{
 		key = json_object_iter_key(iter);
 		printf("Object Key: %s \n", key);
-		
-		value = json_object_iter_value(iter);
-		
+
+		value = json_object_iter_value(iter);		
+		//if (json_typeof(value) == JSON_OBJECT);
+
 		if (json_is_object(value))
 		{
-			return print_keys(value);
+			struct_depth++;
+			iter = json_object_iter_next(obj, iter);
+			if (!iter)
+			{
+				for(int i=struct_depth; i--;) printf("\t");				
+				print_keys(value);
+				break;
+			} else
+			{
+				for(int i=struct_depth; i--;) printf("\t");				
+				print_keys(value);				
+			}
 		}
 		else
-		{
+		{			
 			iter = json_object_iter_next(obj, iter);
+			if (!iter)
+				struct_depth--;
+			for(int i=struct_depth; i--;) printf("\t");
 		}
-	}
+	}	
 	return 0; //json_object_size(obj);
 }
 
