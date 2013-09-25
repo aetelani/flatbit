@@ -92,11 +92,20 @@ int print_keys(json_t * obj)
 	while(iter)
 	{
 		key = json_object_iter_key(iter);
-		value = json_object_iter_value(iter);
 		printf("Object Key: %s \n", key);
-		iter = json_object_iter_next(obj, iter);
+		
+		value = json_object_iter_value(iter);
+		
+		if (json_is_object(value))
+		{
+			return print_keys(value);
+		}
+		else
+		{
+			iter = json_object_iter_next(obj, iter);
+		}
 	}
-	return json_object_size(obj);
+	return 0; //json_object_size(obj);
 }
 
 int parse_json()
