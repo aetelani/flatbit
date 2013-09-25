@@ -83,40 +83,91 @@ static char *request(const char *url)
 
     return write_result.data;
 }
+
+enum key_type {
+	KEYTYPE_UNDEF, KEYTYPE_CTRLKEY
+};
+enum control_key {
+	CTRLKEY_UNDEF, CTRLKEY_VISUAL_TYPE
+};
+
 int struct_depth = 0;
-int print_keys(json_t * obj)
+int print_keys(json_t * obj, enum key_type parentCtx)
 {
 	const char *key;
 	json_t *value;
+	enum key_type  keyType = KEYTYPE_UNDEF;
+	enum control_key controlKey = CTRLKEY_UNDEF;
 	void * iter = json_object_iter(obj);	
 	while(iter)
 	{
 		key = json_object_iter_key(iter);
-		printf("Object Key: %s \n", key);
-
 		value = json_object_iter_value(iter);		
-		//if (json_typeof(value) == JSON_OBJECT);
+		keyType = (key && key[0] == '_') ? KEYTYPE_CTRLKEY: KEYTYPE_UNDEF;
+
+		if (keyType == KEYTYPE_CTRLKEY)
+			printf("Switch ");
+		else if (parentCtx == KEYTYPE_CTRLKEY)
+			printf("");
+		else
+			printf("");
+			
+		if (parentCtx == KEYTYPE_CTRLKEY)
+		{
+			printf("Option: %s", key);
+		}
+		else
+		{
+			printf("Key: %s ", key);
+		}
+
+
+		switch (json_typeof(value)) {
+		case JSON_STRING:
+				printf(": %s", json_string_value(value));
+				break;
+		case JSON_INTEGER:
+				printf(": %i", (int)json_integer_value(value));
+				break;
+		case JSON_REAL:
+				printf(": %i", (int)json_number_value(value));
+				break;
+		case JSON_ARRAY:
+				printf(": [...]");
+				break;
+		case JSON_OBJECT:
+			break;				
+		case JSON_TRUE:
+		case JSON_FALSE:
+		case JSON_NULL: 
+		default:
+			printf("skipped an atom");
+		}
+		printf("\n");
 
 		if (json_is_object(value))
 		{
 			struct_depth++;
 			iter = json_object_iter_next(obj, iter);
+
 			if (!iter)
 			{
 				for(int i=struct_depth; i--;) printf("\t");				
-				print_keys(value);
+				print_keys(value, keyType);
 				break;
 			} else
 			{
 				for(int i=struct_depth; i--;) printf("\t");				
-				print_keys(value);				
+				print_keys(value, keyType);
 			}
 		}
 		else
 		{			
 			iter = json_object_iter_next(obj, iter);
+
 			if (!iter)
 				struct_depth--;
+							
 			for(int i=struct_depth; i--;) printf("\t");
 		}
 	}	
@@ -148,7 +199,7 @@ int parse_json()
 
 //	json_t *data, *sha, *commit, *message;
 
-	print_keys(root);
+	print_keys(root, CTRLKEY_UNDEF);
 	
 	const char *message_text;
 	for(i = 0; i < json_object_size(root); i++)
