@@ -1,12 +1,6 @@
-#include <vector>
+#include <paintengine.h>
 
 #pragma once
-
-typedef std::vector<char> Bits;
-
-class PaintEngine { 
-	void paint(int x, int y, int width, int height, Bits & bits ) {}
-};
 
 class PaintInterface {
 public:
