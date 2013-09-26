@@ -2,30 +2,15 @@
 #include <paintengine.h>
 #include <iostream>
 
-namespace  {
-	Bits b;
-}
 
-Painter::Painter()
-{
-	/*for (int i=10*10; i; i--)
-	{
-			b.push_back('-');
-	}*/
-}
-
-
-Painter::~Painter()
-{
-	b.clear();
-}
-
-int Painter::version()
+template<typename T>
+int Painter<T>::version()
 {
 	return 0;
 }
 
-void Painter::paint()
+template<typename T>
+void Painter<T>::paint()
 {
 	for (Bits::iterator it = b.begin(); it != b.end(); it++)
 		std::cout << *it;
