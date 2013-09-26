@@ -8,7 +8,9 @@ public:
 	virtual int version() = 0;
 };
 
-class Painter : public PaintInterface {
+//template<typename T>
+class Painter : public PaintInterface
+{
 public:
 	Painter();
 	virtual ~Painter();

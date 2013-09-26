@@ -2,20 +2,22 @@
 #include <paintengine.h>
 #include <iostream>
 
-Bits b;
+namespace  {
+	Bits b;
+}
 
 Painter::Painter()
 {
-	PaintEngine * i = createPaintEngine<PaintEngine>();
-	
-	for (int i=10*10; i; i--)
+	/*for (int i=10*10; i; i--)
 	{
 			b.push_back('-');
-	}
+	}*/
 }
+
 
 Painter::~Painter()
 {
+	b.clear();
 }
 
 int Painter::version()
