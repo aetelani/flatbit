@@ -52,7 +52,9 @@ int main()
 	{
 		//printf("(%d,%d)-(%d,%d),(%d,%d):ccw:%d\n", points[i-1].x, points[i-1].y, points[i].x, points[i].y, points[i+1].x, points[i+1].y, !!ccw(points[i-1], points[i], points[i+1]));
 		j=i;
-		while (j+1 < points_count && ccw(points[i-1], points[j], points[j+1]) && j++)
+		while (j < points_count && !ccw(points[i-1], points[j], points[j+1]) && j++) {};
+		
+		if (j < points_count)
 		{
 			hull->p = &(points[j+1]);
 			hull->ccw = 1;
@@ -62,8 +64,8 @@ int main()
 	}
 	struct hull_point * u;
 	u = hull_first;
-	while (u && u->p) {
-		printf("hull:%d,%d\n", u->p->x, u->p->y);
+	while (u && u->p && u->p != &points[0]) {
+		printf("hull:%d,%d, turn:%d\n", u->p->x, u->p->y, u->ccw);
 		u = u->next;
 	}
 	
