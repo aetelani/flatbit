@@ -1,2 +1,2 @@
 all:
-	g++ cv.c -o cv
+	g++ -g cv.c -o cv
