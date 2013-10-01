@@ -26,18 +26,25 @@ int ccw(struct point p1, struct point p2, struct point p3)
 	return ret > 0;
 }
 
+int rand_points(struct point ** pts, const int count, const int dim)
+{
+	*pts = (struct point *)calloc(count, sizeof(struct point));
+	for(int i = 0; i < count; i++)
+	{
+		(*pts)[i].x = rand()%dim;
+		(*pts)[i].y = rand()%dim;
+	}
+	return 0;
+}
+
 int main()
 {
 	srand(time(NULL));
 
-	points = (point*) calloc(points_count, sizeof(struct point));
+	//points = (point*) calloc(points_count, sizeof(struct point));
 	struct point * hull = (point*) calloc(points_count, sizeof(struct point));
 
-	for(int i = 0; i < points_count; i++)
-	{
-		points[i].x = rand()%dimxy;
-		points[i].y = rand()%dimxy;
-	}
+	rand_points(&points, points_count, dimxy);
 
     qsort(points, points_count, sizeof(struct point), cmp_points);
 
@@ -57,6 +64,8 @@ int main()
     /*printf("hull:");
 	for (int i=0; i < hind; i++) { printf("(%d,%d),", hull[i].x, hull[i].y); }
     printf("\n");*/
+    
+    void * r = realloc(hull, sizeof(struct point) * hind);
     
 	int ret = plot(points, points_count, hull, hind);
 	
