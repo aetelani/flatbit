@@ -17,19 +17,20 @@ int plot(struct point * points, int points_count, struct point * path, int steps
 {
 	FILE * plotter = popen ("gnuplot -p ", "w");
 	fprintf(plotter, "set autoscale;\n");
-	fprintf(plotter, "plot '-' w p pt 6 ps 1, '-' w l lc 0;\n"); //, '-' w p lc 0, '-' w lp pt 6 ps 3;\n");
+	fprintf(plotter, "set pm3d map;\n");
+	fprintf(plotter, "splot '-' w p pt 6 ps 0.3 lc rgb variable, '-' w l lc 0;\n"); //, '-' w p lc 0, '-' w lp pt 6 ps 3;\n");
 
 	//fprintf(plotter, "%d %d\ne\n", points[0].x, points[0].y);
 	for(int i = 0; i < points_count; i++)
 	{
-		fprintf(plotter, "%d %d\n", points[i].x, points[i].y);
+		fprintf(plotter, "%d %d %d 0xffff00\n", points[i].x, points[i].y, points[i].z);
 	}
 	fprintf(plotter, "e\n");
     
-	fprintf(plotter, "%d %d\n", points[0].x, points[0].y);
+	fprintf(plotter, "%d %d %d\n", points[0].x, points[0].y, points[0].z);
 	for(int i = 0; i < steps; i++)
 	{
-		fprintf(plotter, "%d %d\n", path[i].x, path[i].y);
+		fprintf(plotter, "%d %d %d\n", path[i].x, path[i].y, path[i].z);
 	}
     fprintf(plotter, "e\n");
     pclose(plotter);
