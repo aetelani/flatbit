@@ -8,8 +8,8 @@ struct point {
 struct point * upper_hull;
 struct point * lower_hull;
 struct point * points;
-static const int points_count = 500;
-static const int dimxy = 1000;
+static const int points_count = 20;
+static const int dimxy = 100;
 
 int plot(struct point * points, int points_count, struct point * hull, int hind);
 

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <sys/param.h>
+#include <math.h>
 
 struct point;
 struct edge {
@@ -53,7 +54,8 @@ int iterNeighbors(struct point ** arr, int i, int j, int dim) {
 				//printf("(%d,%d - %d)~%p",x, y, x*dim+y, &(*arr)[x*dim+y]);
 				//printf(" (%d,%d)\n",i, j);
 				//printf("N%p cnt%d, ", &((*arr)[x*dim+y]), count);
-				arr[i*dim+j]->edges[count].e = &((*arr)[x*dim+y]);
+                if ((*arr)[x*dim+y].z == -1) continue; // starting point
+				arr[i*dim+j]->edges[count].e = &((*arr)[x*dim+y]); // check the overindexin.
 				arr[i*dim+j]->edges[count].cost = rand()%3;
 				count++;
 			}
@@ -86,10 +88,20 @@ static const int dim = 10; // #x
 static const int points_count = 10 * 10; // dim^2
 static int edge_count = 10 * 10 * 8; // points_count * neighbor count
 
-int pf(struct point * ps, struct point * b, struct point * e)
+int pf(struct point * ps, int cnt, struct point * b, struct point * e)
 {
-	for(int i=0; i < 8; i++)
-		printf("edge%d.p=%p ", i, b->edges[i].e);
+    int startIndex;
+    for (startIndex=0; &ps[startIndex] != b; startIndex++);
+
+    printf("start index %d\n", startIndex);
+    double frac, intp;
+	for(int i=0; i < cnt; i++) {
+        frac = modf(i/dim, &intp);
+        frac = i - intp*dim;
+        //intp = i/dim - frac;
+        //printf("farc %d,%d\n", (int)intp, (int)frac);
+        iterNeighbors(&ps, intp, frac, dim); 
+    }
 	
 return 0;
 }
@@ -110,8 +122,8 @@ int main()
 	end = &points[points_count-1];
 	path[path_points++] = *beg;
 	path[path_points++] = *end;
-	beg->z = 0;
+	beg->z = -1;
 	
-	pf(points, beg, end);
+	pf(points, points_count, beg, end);
 //	plot(points, points_count, path, path_points);
 }
