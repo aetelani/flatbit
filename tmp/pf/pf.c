@@ -44,14 +44,16 @@ int plot(struct point * points, int points_count, struct point * path, int steps
     pclose(plotter);
 }
 
-int iterNeighbors(struct point * arr, int i, int j, int dim) {
+int iterNeighbors(struct point ** arr, int i, int j, int dim) {
 	int rowLimit = dim-1, colLimit = dim-1, count = 0;
 	for(int x = MAX(0, i-1); x <= MIN(i+1, rowLimit); x++) {
 		for(int y = MAX(0, j-1); y <= MIN(j+1, colLimit); y++) {
-			if(x != i && y != j) {
-				printf("(%d,%d - %d)~%d\n",x, y, x*dim+y, arr[x*dim+y].z);
-				arr[x*dim+y].edges[count].e = &arr[x*dim+y];
-				arr[x*dim+y].edges[count].cost = rand()%3;
+			if(x != i || y != j) {
+				//printf("(%d,%d - %d)~%p",x, y, x*dim+y, &(*arr)[x*dim+y]);
+				//printf(" (%d,%d)\n",i, j);
+				printf("N%p cnt%d, ", &((*arr)[x*dim+y]), count);
+				arr[i*dim+j]->edges[count].e = &((*arr)[x*dim+y]);
+				arr[i*dim+j]->edges[count].cost = rand()%3;
 				count++;
 			}
 		}
@@ -62,19 +64,20 @@ int iterNeighbors(struct point * arr, int i, int j, int dim) {
 int matrix_points(struct point ** pts, const int count, const int dim)
 {
 	srand(time(NULL));
-	*pts = (struct point *)calloc(count, sizeof(struct point));
-	int i,j, edge_count;
+	(*pts) = (struct point *)realloc(*pts, count * sizeof(struct point));
+	int i,j, cnt=0;
 	const int corner = 3, side = 5, normal = 8;
-	for(i = 0, j = 0, edge_count = 0; i < count;) {
+	for(i = 0, j = 0; i < count;) {
 		for(j=0; j < dim; j++)  {
 			(*pts)[i+j].x = i/dim;
 			(*pts)[i+j].y = j;
 			(*pts)[i+j].z = INT_MAX;
-			printf("(%d,%d,%d)\n", (*pts)[i+j].x, (*pts)[i+j].y, (*pts)[i+j].z);
+			cnt++;
+//			printf("(%d,%d,%d)\n", (*pts)[i+j].x, (*pts)[i+j].y, (*pts)[i+j].z);
 		}
 		i += j;
 	}
-	return 0;
+	return cnt;
 }
 
 struct point * points, * beg, * end;
@@ -82,9 +85,11 @@ static const int dim = 10; // #x
 static const int points_count = 10 * 10; // dim^2
 static int edge_count = 10 * 10 * 8; // points_count * neighbor count
 
-int pf(int a, int b)
+int pf(struct point * ps, struct point * b, struct point * e)
 {
-
+	for(int i=0; i < 8; i++)
+		printf("%p ", b->edges[i].e);
+	
 return 0;
 }
 
@@ -94,7 +99,7 @@ int main()
 	int ret, path_points = 0;
 	ret = matrix_points(&points, points_count, dim);
 	
-	int ncount = iterNeighbors(points, dim-1, 1, dim);
+	int ncount = iterNeighbors(&points, 0, 0, dim);
 	printf("number of neighbours:%d\n", ncount);
 	
 	struct point * path = (struct point *)calloc(points_count, sizeof(struct point));
@@ -104,7 +109,9 @@ int main()
 	end = &points[points_count-1];
 	path[path_points++] = *beg;
 	path[path_points++] = *end;
+	beg->z = 0;
+	beg->edges[0].e = 0;
 	
-	pf(1,1);
-	plot(points, points_count, path, path_points);
+	pf(points, beg, end);
+//	plot(points, points_count, path, path_points);
 }
