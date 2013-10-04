@@ -118,20 +118,19 @@ struct point * cheapestNotVisitedNeighbor(struct point * ps)
 	struct point * cheapptr = NULL;
 	for(int i=0; !!ps->edges[i].e && i < NODE_EDGE_COUNT; i++)
 	{
-		
-		if ((ps->edges[i].e->flag == NOT_VISITED || ps->edges[i].e->flag == TARGET) && ps->edges[i].cost < cheapest) {
-			cheapest = ps->edges[i].cost;			
-			cheapptr = ps->edges[i].e;
-			cheapptr->parent = ps;
-		}					
-		
 		if ((ps->edges[i].e->flag == NOT_VISITED || ps->edges[i].e->flag == TARGET) && ps->edges[i].e->z > (ps->edges[i].cost + ps->z)) {
-			ps->edges[i].e->z = (ps->edges[i].cost + ps->z);
-			//printf("errrr: cheapest:%d, %d : %d\n", ps->x, ps->y, ps->z);
+			ps->edges[i].e->z = (ps->edges[i].cost + ps->z);						
 		}
-
+		
+		if ((ps->edges[i].e->flag == NOT_VISITED || ps->edges[i].e->flag == TARGET) && ps->edges[i].e->z < cheapest) {
+			cheapest = ps->edges[i].e->z;
+			cheapptr = ps->edges[i].e;
+			cheapptr->parent = ps;			
+		}
+//		if(ps->edges[i].e->flag == TARGET) printf("Target on sight\n");
 		//printf("errrr: ind:%d, %d == NOT_VISITED, cost %d\n", i, ps->edges[i].e->flag == NOT_VISITED, cheapest);		
 	}
+	if (cheapptr) printf("cheapest:%d, %d : %d\n", cheapptr->x, cheapptr->y, cheapptr->z);
 	return cheapptr;
 }
 int getInd(struct point * ps, struct point * p, int cnt)
@@ -168,18 +167,17 @@ int pf(struct point * ps, int cnt)
 				printf("TARGET FOUND\n");
 				break;
 			}
-			printf("iter, %d, %d, ", pptr0->x, pptr0->y);
-			printf("-> %d, %d\n", pptr1->x, pptr1->y);		
+			//printf("iter, %d, %d, ", pptr0->x, pptr0->y); printf("-> %d, %d\n", pptr1->x, pptr1->y);		
 			parent = pptr0;
-			pptr0 = pptr1;		
+			pptr0 = pptr1;
 		} else {
 			//rollback to parent node if no solution			
 			//parent->flag = NOT_VISITED;
 			//pptr0 = parent;
 			
 			pptr0 = rollbackToParent(pptr0);
-			printf("rollback to %d, %d\n", pptr0->x, pptr0->y);
-//			if (!safeSwitch--) exit(0); 
+			//printf("rollback to %d, %d\n", pptr0->x, pptr0->y);
+			assert(pptr0->parent);
 			
 			/*int i;
 			for (int i=0; i < NODE_EDGE_COUNT && pptr0->edges[i].e && pptr0->edges[i].e->flag == VISITED; i++); 
@@ -209,11 +207,13 @@ int main()
 	path[path_points++] = *end;
 	beg->flag = HOME;
 	beg->parent = 0;
+	beg->z = 0;
 	end->flag = TARGET;
 	
 	pf(points, points_count);
 	plot(points, points_count, path, path_points);
 	struct point * p;
-	for (p = end; p->parent; p = p->parent)
-		printf("path (%d,%d)\n", p->x, p->y);
+	printf("path: cost : %d\n", end->z);
+//	for (p = end; p->parent; p = p->parent)
+//		printf("(%d,%d)->(%d,%d)\n", p->x, p->y, p->parent->x, p->parent->y);
 }
