@@ -130,7 +130,7 @@ struct point * cheapestNotVisitedNeighbor(struct point * ps)
 //		if(ps->edges[i].e->flag == TARGET) printf("Target on sight\n");
 		//printf("errrr: ind:%d, %d == NOT_VISITED, cost %d\n", i, ps->edges[i].e->flag == NOT_VISITED, cheapest);		
 	}
-	if (cheapptr) printf("cheapest:%d, %d : %d\n", cheapptr->x, cheapptr->y, cheapptr->z);
+	//if (cheapptr) printf("cheapest:%d, %d : %d\n", cheapptr->x, cheapptr->y, cheapptr->z);
 	return cheapptr;
 }
 int getInd(struct point * ps, struct point * p, int cnt)
@@ -196,7 +196,6 @@ int main()
 	ret = matrix_points(&points, points_count, dim);
 	
 	int ncount = setNodeNeighbors(&points, 0, 0, dim);
-	printf("number of neighbours:%d\n", ncount);
 	
 	struct point * path = (struct point *)calloc(points_count, sizeof(struct point));
 	
@@ -214,6 +213,6 @@ int main()
 	plot(points, points_count, path, path_points);
 	struct point * p;
 	printf("path: cost : %d\n", end->z);
-//	for (p = end; p->parent; p = p->parent)
-//		printf("(%d,%d)->(%d,%d)\n", p->x, p->y, p->parent->x, p->parent->y);
+	for (p = end; p->parent; p = p->parent)
+		printf("(%d,%d):%d->(%d,%d):%d\n", p->x, p->y, p->z, p->z, p->parent->x, p->parent->y, p->parent->z );
 }
