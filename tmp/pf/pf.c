@@ -8,10 +8,10 @@
 
 #define UNDEF INT_MIN
 #define INF INT_MAX
-#define VISITED 0xc3b8
+#define VISITED 'X'
 #define NOT_VISITED 'o'
 #define HOME 'H'
-#define TARGET 'X'
+#define TARGET '@'
 #define NODE_EDGE_COUNT 8
 struct point;
 struct edge {
@@ -22,6 +22,7 @@ struct edge {
 struct point {
 	int x, y, z, flag;
 	struct edge edges[NODE_EDGE_COUNT];
+	struct point * parent;
 };
 
 int cmp_points(const void * lhs, const void * rhs)
@@ -41,7 +42,12 @@ int plot(struct point * points, int points_count, struct point * path, int steps
 
 	for(int i = 0; i < points_count; i++)
 	{
-		fprintf(plotter, "%d %d %c 0xaf0000\n", points[i].x, points[i].y, points[i].flag);
+		char *color;
+		switch(points[i].flag) {
+			case VISITED: color = "0xfa0000"; break;
+			default: color = "0x000000"; break;
+		}
+		fprintf(plotter, "%d %d %c %s\n", points[i].x, points[i].y, points[i].flag, color);
 	}
 	fprintf(plotter, "e\n");
     
@@ -105,19 +111,42 @@ int setupNeighbors(struct point * ps, int cnt)
 	}
 }
 
-int cheapestNotVisitedNeighbor(struct point * ps)
+struct point * cheapestNotVisitedNeighbor(struct point * ps)
 {
 	assert(!!ps);
-	int cheapest = INF, cheapind = UNDEF;	
+	int cheapest = INF;
+	struct point * cheapptr = NULL;
 	for(int i=0; !!ps->edges[i].e && i < NODE_EDGE_COUNT; i++)
 	{
-		if (ps->edges[i].e->flag == NOT_VISITED && ps->edges[i].cost < cheapest) {
-			cheapest = ps->edges[i].cost;
-			cheapind = i;
+		
+		if ((ps->edges[i].e->flag == NOT_VISITED || ps->edges[i].e->flag == TARGET) && ps->edges[i].cost < cheapest) {
+			cheapest = ps->edges[i].cost;			
+			cheapptr = ps->edges[i].e;
+			cheapptr->parent = ps;
+		}					
+		
+		if ((ps->edges[i].e->flag == NOT_VISITED || ps->edges[i].e->flag == TARGET) && ps->edges[i].e->z > (ps->edges[i].cost + ps->z)) {
+			ps->edges[i].e->z = (ps->edges[i].cost + ps->z);
+			//printf("errrr: cheapest:%d, %d : %d\n", ps->x, ps->y, ps->z);
 		}
+
+		//printf("errrr: ind:%d, %d == NOT_VISITED, cost %d\n", i, ps->edges[i].e->flag == NOT_VISITED, cheapest);		
 	}
-	assert(cheapind!=INF);
-	return cheapind;
+	return cheapptr;
+}
+int getInd(struct point * ps, struct point * p, int cnt)
+{ 
+	int i;
+    for (i=0; &ps[i] != p; i++) {assert(i<=cnt);}
+    return i;
+}
+struct point * rollbackToParent(struct point * p)
+{
+	struct point * ret = NULL;	
+	ret = p->parent;
+	p->parent = NULL;
+	assert(ret);
+	return ret;
 }
 
 int pf(struct point * ps, int cnt)
@@ -125,8 +154,40 @@ int pf(struct point * ps, int cnt)
     int startIndex;
     for (startIndex=0; ps[startIndex].flag != HOME; startIndex++);
     setupNeighbors(ps,cnt);
-    printf("cheapest not visited neighbor ind:%d\n", cheapestNotVisitedNeighbor(ps));
-	
+    
+    struct point * pptr1, * parent, * pptr0 = &ps[startIndex];
+    
+    int safeSwitch = 10;
+    for (;;)
+    {
+		pptr1 = cheapestNotVisitedNeighbor(pptr0);
+		pptr0->flag = VISITED;
+		
+		if (pptr1 != NULL) {			
+			if(pptr1->flag == TARGET) {
+				printf("TARGET FOUND\n");
+				break;
+			}
+			printf("iter, %d, %d, ", pptr0->x, pptr0->y);
+			printf("-> %d, %d\n", pptr1->x, pptr1->y);		
+			parent = pptr0;
+			pptr0 = pptr1;		
+		} else {
+			//rollback to parent node if no solution			
+			//parent->flag = NOT_VISITED;
+			//pptr0 = parent;
+			
+			pptr0 = rollbackToParent(pptr0);
+			printf("rollback to %d, %d\n", pptr0->x, pptr0->y);
+//			if (!safeSwitch--) exit(0); 
+			
+			/*int i;
+			for (int i=0; i < NODE_EDGE_COUNT && pptr0->edges[i].e && pptr0->edges[i].e->flag == VISITED; i++); 
+			if (i == NODE_EDGE_COUNT) { printf("all visited in node!\n" ); assert(0); }*/
+		}
+	}
+    //int ind = getInd(ps,pptr0, INT_MAX);
+    //printf("cheapest not visited neighbor ind:%d\n", ind);
 return 0;
 }
 
@@ -147,8 +208,12 @@ int main()
 	path[path_points++] = *beg;
 	path[path_points++] = *end;
 	beg->flag = HOME;
+	beg->parent = 0;
 	end->flag = TARGET;
 	
 	pf(points, points_count);
 	plot(points, points_count, path, path_points);
+	struct point * p;
+	for (p = end; p->parent; p = p->parent)
+		printf("path (%d,%d)\n", p->x, p->y);
 }
