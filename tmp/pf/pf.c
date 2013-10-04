@@ -3,12 +3,16 @@
 #include <time.h>
 #include <sys/param.h>
 #include <math.h>
+#include <assert.h>
 
+
+#define UNDEF INT_MIN
 #define INF INT_MAX
-#define VISITED 1
-#define NOT_VISITED 0
-#define HOME -1
-#define TARGET -2
+#define VISITED 0xc3b8
+#define NOT_VISITED 'o'
+#define HOME 'H'
+#define TARGET 'X'
+#define NODE_EDGE_COUNT 8
 struct point;
 struct edge {
 	struct point * e;
@@ -17,7 +21,7 @@ struct edge {
 
 struct point {
 	int x, y, z, flag;
-	struct edge edges[8];
+	struct edge edges[NODE_EDGE_COUNT];
 };
 
 int cmp_points(const void * lhs, const void * rhs)
@@ -33,11 +37,11 @@ int plot(struct point * points, int points_count, struct point * path, int steps
 	fprintf(plotter, "set autoscale;\n");
 	fprintf(plotter, "set pm3d map;\n");
 //	fprintf(plotter, "splot '-' w p pt 6 ps 0.3 lc rgb variable, '-' w l lc rgb variable;\n"); //, '-' w p lc 0, '-' w lp pt 6 ps 3;\n");
-	fprintf(plotter, "splot '-' w labels tc rgb variable, '-' w l lc rgb variable;\n"); //, '-' w p lc 0, '-' w lp pt 6 ps 3;\n");
+	fprintf(plotter, "plot '-' w labels tc rgb variable, '-' w l lc rgb variable;\n"); //, '-' w p lc 0, '-' w lp pt 6 ps 3;\n");
 
 	for(int i = 0; i < points_count; i++)
 	{
-		fprintf(plotter, "%d %d %d %c 0xaf0a00\n", points[i].x, points[i].y, points[i].z, (points[i].z==INF?0xf8:points[i].z));
+		fprintf(plotter, "%d %d %c 0xaf0000\n", points[i].x, points[i].y, points[i].flag);
 	}
 	fprintf(plotter, "e\n");
     
@@ -88,22 +92,40 @@ int matrix_points(struct point ** pts, const int count, const int dim)
 struct point * points, * beg, * end;
 static const int dim = 10; // #x
 static const int points_count = 10 * 10; // dim^2
-static int edge_count = 10 * 10 * 8; // points_count * neighbor count
+static int edge_count = 10 * 10 * NODE_EDGE_COUNT; // points_count * neighbor count
 
-int pf(struct point * ps, int cnt, struct point * b, struct point * e)
+int setupNeighbors(struct point * ps, int cnt)
+{
+	int frac, intp;
+	for(int i=0; i < cnt; i++) {
+		//frac = modf(i/dim, &intp);
+		intp = (int) i/dim;
+		frac = i - intp*dim;
+		setNodeNeighbors(&ps, intp, frac, dim);
+	}
+}
+
+int cheapestNotVisitedNeighbor(struct point * ps)
+{
+	assert(!!ps);
+	int cheapest = INF, cheapind = UNDEF;	
+	for(int i=0; !!ps->edges[i].e && i < NODE_EDGE_COUNT; i++)
+	{
+		if (ps->edges[i].e->flag == NOT_VISITED && ps->edges[i].cost < cheapest) {
+			cheapest = ps->edges[i].cost;
+			cheapind = i;
+		}
+	}
+	assert(cheapind!=INF);
+	return cheapind;
+}
+
+int pf(struct point * ps, int cnt)
 {
     int startIndex;
-    for (startIndex=0; &ps[startIndex] != b; startIndex++);
-
-    printf("start index %d\n", startIndex);
-    double frac, intp;
-	for(int i=0; i < cnt; i++) {
-        frac = modf(i/dim, &intp);
-        frac = i - intp*dim;
-        //intp = i/dim - frac;
-        //printf("farc %d,%d\n", (int)intp, (int)frac);
-        setNodeNeighbors(&ps, intp, frac, dim);
-    }
+    for (startIndex=0; ps[startIndex].flag != HOME; startIndex++);
+    setupNeighbors(ps,cnt);
+    printf("cheapest not visited neighbor ind:%d\n", cheapestNotVisitedNeighbor(ps));
 	
 return 0;
 }
@@ -127,6 +149,6 @@ int main()
 	beg->flag = HOME;
 	end->flag = TARGET;
 	
-	pf(points, points_count, beg, end);
-//	plot(points, points_count, path, path_points);
+	pf(points, points_count);
+	plot(points, points_count, path, path_points);
 }
