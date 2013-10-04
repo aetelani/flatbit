@@ -214,5 +214,5 @@ int main()
 	struct point * p;
 	printf("path: cost : %d\n", end->z);
 	for (p = end; p->parent; p = p->parent)
-		printf("(%d,%d):%d->(%d,%d):%d\n", p->x, p->y, p->z, p->z, p->parent->x, p->parent->y, p->parent->z );
+		printf("(%d,%d):%d->(%d,%d):%d\n", p->x, p->y, p->z, p->parent->x, p->parent->y, p->parent->z );
 }
