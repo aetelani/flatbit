@@ -4,6 +4,11 @@
 #include <sys/param.h>
 #include <math.h>
 
+#define INF INT_MAX
+#define VISITED 1
+#define NOT_VISITED 0
+#define HOME -1
+#define TARGET -2
 struct point;
 struct edge {
 	struct point * e;
@@ -11,7 +16,7 @@ struct edge {
 };
 
 struct point {
-	int x, y, z;
+	int x, y, z, flag;
 	struct edge edges[8];
 };
 
@@ -32,7 +37,7 @@ int plot(struct point * points, int points_count, struct point * path, int steps
 
 	for(int i = 0; i < points_count; i++)
 	{
-		fprintf(plotter, "%d %d %d %c 0xaf0a00\n", points[i].x, points[i].y, points[i].z, (points[i].z==INT_MAX?0xf8:points[i].z));
+		fprintf(plotter, "%d %d %d %c 0xaf0a00\n", points[i].x, points[i].y, points[i].z, (points[i].z==INF?0xf8:points[i].z));
 	}
 	fprintf(plotter, "e\n");
     
@@ -46,17 +51,13 @@ int plot(struct point * points, int points_count, struct point * path, int steps
     return 0;
 }
 
-int iterNeighbors(struct point ** arr, int i, int j, int dim) {
+int setNodeNeighbors(struct point ** arr, int i, int j, int dim) {
 	int rowLimit = dim-1, colLimit = dim-1, count = 0;
 	for(int x = MAX(0, i-1); x <= MIN(i+1, rowLimit); x++) {
 		for(int y = MAX(0, j-1); y <= MIN(j+1, colLimit); y++) {
 			if(x != i || y != j) {
-				//printf("(%d,%d - %d)~%p",x, y, x*dim+y, &(*arr)[x*dim+y]);
-				//printf(" (%d,%d)\n",i, j);
-				//printf("N%p cnt%d, ", &((*arr)[x*dim+y]), count);
-                if ((*arr)[x*dim+y].z == -1) continue; // starting point
-				arr[i*dim+j]->edges[count].e = &((*arr)[x*dim+y]); // check the overindexin.
-				arr[i*dim+j]->edges[count].cost = rand()%3;
+				(*arr)[i*dim+j].edges[count].e = &((*arr)[x*dim+y]);
+				(*arr)[i*dim+j].edges[count].cost = rand()%3;
 				count++;
 			}
 		}
@@ -74,7 +75,8 @@ int matrix_points(struct point ** pts, const int count, const int dim)
 		for(j=0; j < dim; j++)  {
 			(*pts)[i+j].x = i/dim;
 			(*pts)[i+j].y = j;
-			(*pts)[i+j].z = INT_MAX;
+			(*pts)[i+j].z = INF;
+			(*pts)[i+j].flag = NOT_VISITED;
 			cnt++;
 //			printf("(%d,%d,%d)\n", (*pts)[i+j].x, (*pts)[i+j].y, (*pts)[i+j].z);
 		}
@@ -100,7 +102,7 @@ int pf(struct point * ps, int cnt, struct point * b, struct point * e)
         frac = i - intp*dim;
         //intp = i/dim - frac;
         //printf("farc %d,%d\n", (int)intp, (int)frac);
-        iterNeighbors(&ps, intp, frac, dim); 
+        setNodeNeighbors(&ps, intp, frac, dim);
     }
 	
 return 0;
@@ -112,7 +114,7 @@ int main()
 	int ret, path_points = 0;
 	ret = matrix_points(&points, points_count, dim);
 	
-	int ncount = iterNeighbors(&points, 0, 0, dim);
+	int ncount = setNodeNeighbors(&points, 0, 0, dim);
 	printf("number of neighbours:%d\n", ncount);
 	
 	struct point * path = (struct point *)calloc(points_count, sizeof(struct point));
@@ -122,7 +124,8 @@ int main()
 	end = &points[points_count-1];
 	path[path_points++] = *beg;
 	path[path_points++] = *end;
-	beg->z = -1;
+	beg->flag = HOME;
+	end->flag = TARGET;
 	
 	pf(points, points_count, beg, end);
 //	plot(points, points_count, path, path_points);
