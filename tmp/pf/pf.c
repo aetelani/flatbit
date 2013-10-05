@@ -33,7 +33,7 @@ int cmp_points(const void * lhs, const void * rhs)
 			((struct point *)lhs)->x > ((struct point *)rhs)->x ;
 }
 
-int plot(struct point * points, int points_count, struct point * path, int steps)
+int plot(struct point * points, int points_count, struct point * path)
 {
 	FILE * plotter = popen ("gnuplot -p ", "w");
 	fprintf(plotter, "set autoscale;\n");
@@ -52,10 +52,11 @@ int plot(struct point * points, int points_count, struct point * path, int steps
 	}
 	fprintf(plotter, "e\n");
     
-	fprintf(plotter, "%d %d %d\n", points[0].x, points[0].y, points[0].z);
-	for(int i = 0; i < steps; i++)
+	//fprintf(plotter, "%d %d %d\n", points[0].x, points[0].y, points[0].z);
+    for (struct point * p = path; p->parent; p = p->parent)
+	//for(int i = 0; i < steps; i++)
 	{
-		fprintf(plotter, "%d %d %d 0xFF00FF\n", path[i].x, path[i].y, path[i].z);
+		fprintf(plotter, "%d %d %d 0xFF00FF\n", p->x, p->y, p->z);
 	}
     fprintf(plotter, "e\n");
     pclose(plotter);
@@ -69,7 +70,7 @@ int setNodeNeighbors(struct point ** arr, int i, int j, int dim) {
 	for(int x = MAX(0, i-1); x <= MIN(i+1, rowLimit); x++) {
 		for(int y = MAX(0, j-1); y <= MIN(j+1, colLimit); y++) {
 			if(x != i || y != j) {
-                for(int k = 0; k < NODE_EDGE_COUNT; k++) {
+                for(int k = 0; k < NODE_EDGE_COUNT; k++) { // single direction connections
                     for(int l = 0; l < NODE_EDGE_COUNT; l++) {
                         if((*arr)[x*dim+y].edges[k].e == &(*arr)[i*dim+j]) {
                             skip = 1;
@@ -110,12 +111,7 @@ int matrix_points(struct point ** pts, const int count, const int dim)
 	return cnt;
 }
 
-struct point * points, * beg, * end;
-static const int dim = 10; // #x
-static const int points_count = 10 * 10; // dim^2
-static int edge_count = 10 * 10 * NODE_EDGE_COUNT; // points_count * neighbor count
-
-int setupNeighbors(struct point * ps, int cnt)
+int setupNeighbors(struct point * ps, int cnt, int dim)
 {
     for(int i=0; i < cnt; i++) {
         for (int j=0; j < NODE_EDGE_COUNT; j++)
@@ -168,11 +164,11 @@ struct point * rollbackToParent(struct point * p)
 	return ret;
 }
 
-int pf(struct point * ps, int cnt)
+int pf(struct point * ps, int cnt, int dim)
 {
     int startIndex;
     for (startIndex=0; ps[startIndex].flag != HOME; startIndex++);
-    setupNeighbors(ps,cnt);
+    setupNeighbors(ps,cnt, dim);
     
     struct point * pptr1, * parent, * pptr0 = &ps[startIndex];
     
@@ -204,7 +200,7 @@ int pf(struct point * ps, int cnt)
 			//parent->flag = NOT_VISITED;
 			//pptr0 = parent;
 			
-			pptr0 = rollbackToParent(pptr0);
+			//pptr0 = rollbackToParent(pptr0);
 			printf("rollback to %d, %d\n", pptr0->x, pptr0->y);
 			assert(pptr0->parent);
 			
@@ -220,28 +216,27 @@ return 0;
 
 
 int main()
-{	
+{
+    static struct point * points, * beg, * end;
+    const int dim = 10; // #x
+    const int points_count = 10 * 10; // dim^2
+    const int edge_count = 10 * 10 * NODE_EDGE_COUNT; // points_count * neighbor count
+    
 	int ret, path_points = 0;
 	ret = matrix_points(&points, points_count, dim);
 	
 	int ncount = setNodeNeighbors(&points, 0, 0, dim);
 	
-	struct point * path = (struct point *)calloc(points_count, sizeof(struct point));
-	
 	//qsort(points, points_count, sizeof(struct point), cmp_points);
 	beg = &points[0];
 	end = &points[points_count-1];
-	path[path_points++] = *beg;
-	path[path_points++] = *end;
 	beg->flag = HOME;
 	beg->parent = 0;
 	beg->z = 0;
 	end->flag = TARGET;
+
+    struct point * path = end;
 	
-	pf(points, points_count);
-	plot(points, points_count, path, path_points);
-	struct point * p;
-	printf("path: cost : %d\n", end->z);
-	for (p = end; p->parent; p = p->parent)
-		printf("(%d,%d):%d)<-(%d,%d):%d\n", p->x, p->y, p->z, p->parent->x, p->parent->y, p->parent->z );
+	pf(points, points_count, dim);
+	plot(points, points_count, path);
 }
