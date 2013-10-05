@@ -17,6 +17,7 @@ struct point;
 struct edge {
 	struct point * e;
 	int cost;
+    int flag;
 };
 
 struct point {
@@ -60,18 +61,32 @@ int plot(struct point * points, int points_count, struct point * path, int steps
     pclose(plotter);
     return 0;
 }
-
+static FILE * dbg;
 int setNodeNeighbors(struct point ** arr, int i, int j, int dim) {
+    dbg = fopen("debug", "a");
+    int skip = 0;
 	int rowLimit = dim-1, colLimit = dim-1, count = 0;
 	for(int x = MAX(0, i-1); x <= MIN(i+1, rowLimit); x++) {
 		for(int y = MAX(0, j-1); y <= MIN(j+1, colLimit); y++) {
 			if(x != i || y != j) {
-				(*arr)[i*dim+j].edges[count].e = &((*arr)[x*dim+y]);
-				(*arr)[i*dim+j].edges[count].cost = rand()%3;
-				count++;
-			}
-		}
-	}
+                for(int k = 0; k < NODE_EDGE_COUNT; k++) {
+                    for(int l = 0; l < NODE_EDGE_COUNT; l++) {
+                        if((*arr)[x*dim+y].edges[k].e == &(*arr)[i*dim+j]) {
+                            skip = 1;
+                        }
+                    }
+                }
+                if (skip) { skip = 0; continue; }
+                else {
+                    (*arr)[i*dim+j].edges[count].e = &((*arr)[x*dim+y]);
+                    (*arr)[i*dim+j].edges[count].cost = rand()%3;
+                    (*arr)[i*dim+j].edges[count].flag = 0;
+                    fprintf(dbg,"%d,%d->%d.%d:%d. flag:%d\n", i, j,  (*arr)[i*dim+j].edges[count].e->x, (*arr)[i*dim+j].edges[count].e->y, (*arr)[i*dim+j].edges[count].cost, (*arr)[i*dim+j].edges[count].flag);
+                    count++;
+                }
+            }
+        }
+    }
 	return count;
 }
 
@@ -102,6 +117,10 @@ static int edge_count = 10 * 10 * NODE_EDGE_COUNT; // points_count * neighbor co
 
 int setupNeighbors(struct point * ps, int cnt)
 {
+    for(int i=0; i < cnt; i++) {
+        for (int j=0; j < NODE_EDGE_COUNT; j++)
+            ps[i].edges[j].flag = 1;
+    }
 	int frac, intp;
 	for(int i=0; i < cnt; i++) {
 		//frac = modf(i/dim, &intp);
@@ -109,6 +128,7 @@ int setupNeighbors(struct point * ps, int cnt)
 		frac = i - intp*dim;
 		setNodeNeighbors(&ps, intp, frac, dim);
 	}
+    fclose(dbg);
 }
 
 struct point * cheapestNotVisitedNeighbor(struct point * ps)
@@ -160,6 +180,15 @@ int pf(struct point * ps, int cnt)
     for (;;)
     {
 		pptr1 = cheapestNotVisitedNeighbor(pptr0);
+
+        /*int cheapest = INT_MAX, cind = -1;
+        for (int i = 0; i < cnt; i++)
+        {
+            if (ps[i].z < cheapest && ps[i].flag != HOME) { cheapest = ps[i].z; cind = i; }
+        }
+        pptr1 = &ps[cind];
+        pptr1->parent = pptr0;*/
+        
 		pptr0->flag = VISITED;
 		
 		if (pptr1 != NULL) {			
@@ -176,7 +205,7 @@ int pf(struct point * ps, int cnt)
 			//pptr0 = parent;
 			
 			pptr0 = rollbackToParent(pptr0);
-			//printf("rollback to %d, %d\n", pptr0->x, pptr0->y);
+			printf("rollback to %d, %d\n", pptr0->x, pptr0->y);
 			assert(pptr0->parent);
 			
 			/*int i;
