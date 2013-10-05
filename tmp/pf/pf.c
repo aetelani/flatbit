@@ -13,6 +13,9 @@
 #define HOME 'H'
 #define TARGET '@'
 #define NODE_EDGE_COUNT 8
+
+static FILE * dbg;
+
 struct point;
 struct edge {
 	struct point * e;
@@ -39,7 +42,8 @@ int plot(struct point * points, int points_count, struct point * path)
 	fprintf(plotter, "set autoscale;\n");
 	fprintf(plotter, "set pm3d map;\n");
 //	fprintf(plotter, "splot '-' w p pt 6 ps 0.3 lc rgb variable, '-' w l lc rgb variable;\n"); //, '-' w p lc 0, '-' w lp pt 6 ps 3;\n");
-	fprintf(plotter, "plot '-' w labels tc rgb variable, '-' w l lc rgb variable;\n"); //, '-' w p lc 0, '-' w lp pt 6 ps 3;\n");
+	//fprintf(plotter, "plot '-' w labels tc rgb variable, '-' w l lc rgb variable;\n"); //, '-' w p lc 0, '-' w lp pt 6 ps 3;\n");
+    fprintf(plotter, "plot '-' w labels tc rgb variable, '-' w vector;\n"); //, '-' w p lc 0, '-' w lp pt 6 ps 3;\n");
 
 	for(int i = 0; i < points_count; i++)
 	{
@@ -51,20 +55,23 @@ int plot(struct point * points, int points_count, struct point * path)
 		fprintf(plotter, "%d %d %c %s\n", points[i].x, points[i].y, points[i].flag, color);
 	}
 	fprintf(plotter, "e\n");
-    
+
+    dbg = fopen("debug", "w");
 	//fprintf(plotter, "%d %d %d\n", points[0].x, points[0].y, points[0].z);
-    for (struct point * p = path; p->parent; p = p->parent)
+    for (struct point * p = path, * pp = path->parent; !!pp; p = p->parent, pp = p->parent)
 	//for(int i = 0; i < steps; i++)
 	{
-		fprintf(plotter, "%d %d %d 0xFF00FF\n", p->x, p->y, p->z);
+		fprintf(plotter, "%d %d %d %d\n",pp->x, pp->y, p->x-pp->x, p->y-pp->y);
+        fprintf(dbg, "%d %d %d %d\n", pp->x, pp->y, p->x-pp->x, p->y-pp->y);
+        
 	}
+    fclose(dbg);
     fprintf(plotter, "e\n");
     pclose(plotter);
     return 0;
 }
-static FILE * dbg;
+
 int setNodeNeighbors(struct point ** arr, int i, int j, int dim) {
-    dbg = fopen("debug", "a");
     int skip = 0;
 	int rowLimit = dim-1, colLimit = dim-1, count = 0;
 	for(int x = MAX(0, i-1); x <= MIN(i+1, rowLimit); x++) {
@@ -82,7 +89,7 @@ int setNodeNeighbors(struct point ** arr, int i, int j, int dim) {
                     (*arr)[i*dim+j].edges[count].e = &((*arr)[x*dim+y]);
                     (*arr)[i*dim+j].edges[count].cost = rand()%3;
                     (*arr)[i*dim+j].edges[count].flag = 0;
-                    fprintf(dbg,"%d,%d->%d.%d:%d. flag:%d\n", i, j,  (*arr)[i*dim+j].edges[count].e->x, (*arr)[i*dim+j].edges[count].e->y, (*arr)[i*dim+j].edges[count].cost, (*arr)[i*dim+j].edges[count].flag);
+                    //fprintf(dbg,"%d,%d->%d.%d:%d. flag:%d\n", i, j,  (*arr)[i*dim+j].edges[count].e->x, (*arr)[i*dim+j].edges[count].e->y, (*arr)[i*dim+j].edges[count].cost, (*arr)[i*dim+j].edges[count].flag);
                     count++;
                 }
             }
@@ -124,7 +131,6 @@ int setupNeighbors(struct point * ps, int cnt, int dim)
 		frac = i - intp*dim;
 		setNodeNeighbors(&ps, intp, frac, dim);
 	}
-    fclose(dbg);
 }
 
 struct point * cheapestNotVisitedNeighbor(struct point * ps)
