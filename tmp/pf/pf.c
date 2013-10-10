@@ -133,6 +133,33 @@ int setupNeighbors(struct point * ps, int cnt, int dim)
 	}
 }
 
+void updateNeighbours(struct point * ps)
+{
+	for(int i=0; !!ps->edges[i].e && i < NODE_EDGE_COUNT; i++)
+	{
+		if ((ps->edges[i].e->flag == NOT_VISITED || ps->edges[i].e->flag == TARGET) && ps->edges[i].e->z > (ps->edges[i].cost + ps->z)) {
+			ps->edges[i].e->z = (ps->edges[i].cost + ps->z);						
+		}
+	}	
+}
+
+struct point * cheapestVisitedNeighbor(struct point * ps)
+{
+	assert(!!ps);
+	int cheapest = INF;
+	struct point * cheapptr = NULL;
+	for(int i=0; !!ps->edges[i].e && i < NODE_EDGE_COUNT; i++)
+	{	
+		if ((ps->edges[i].e->flag == VISITED || ps->edges[i].e->flag == HOME) && ps->edges[i].e->z < cheapest)
+		{
+			cheapest = ps->edges[i].e->z;
+			cheapptr = ps->edges[i].e;
+			cheapptr->parent = ps;			
+		}
+	}
+	return cheapptr;
+}
+
 struct point * cheapestNotVisitedNeighbor(struct point * ps)
 {
 	assert(!!ps);
@@ -169,6 +196,18 @@ struct point * rollbackToParent(struct point * p)
 	assert(ret);
 	return ret;
 }
+struct point * cheapestNode(struct point ** arr, int dim)
+{
+	int cheapest = INF;
+
+	int x = 0, y = 0, ind = -1;
+	for (x=0; x < dim; x++)
+		for (y=0; y < dim; y++) 
+			if ((*arr)[x*dim+y].flag == NOT_VISITED && (*arr)[x*dim+y].z < cheapest)
+				cheapest = (*arr)[x*dim+y].z, ind = x*dim+y;
+
+	return &(*arr)[ind];
+}
 
 int pf(struct point * ps, int cnt, int dim)
 {
@@ -182,6 +221,10 @@ int pf(struct point * ps, int cnt, int dim)
     for (;;)
     {
 		pptr1 = cheapestNotVisitedNeighbor(pptr0);
+		
+		struct point * i = cheapestNode(&ps, dim);
+		cheapestVisitedNeighbor(i);
+		printf("cheapest node %p, z: %d \n", i, i->z);
 
         /*int cheapest = INT_MAX, cind = -1;
         for (int i = 0; i < cnt; i++)
@@ -195,7 +238,7 @@ int pf(struct point * ps, int cnt, int dim)
 		
 		if (pptr1 != NULL) {			
 			if(pptr1->flag == TARGET) {
-				printf("TARGET FOUND\n");
+				printf("TARGET FOUND with cost: %d\n", pptr1->z);
 				break;
 			}
 			//printf("iter, %d, %d, ", pptr0->x, pptr0->y); printf("-> %d, %d\n", pptr1->x, pptr1->y);		
@@ -206,7 +249,7 @@ int pf(struct point * ps, int cnt, int dim)
 			//parent->flag = NOT_VISITED;
 			//pptr0 = parent;
 			
-			//pptr0 = rollbackToParent(pptr0);
+			pptr0 = rollbackToParent(pptr0);
 			printf("rollback to %d, %d\n", pptr0->x, pptr0->y);
 			assert(pptr0->parent);
 			
