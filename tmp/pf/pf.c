@@ -126,21 +126,29 @@ int setupNeighbors(struct point * ps, int cnt, int dim)
     }
 	int frac, intp;
 	for(int i=0; i < cnt; i++) {
-		//frac = modf(i/dim, &intp);
 		intp = (int) i/dim;
 		frac = i - intp*dim;
 		setNodeNeighbors(&ps, intp, frac, dim);
 	}
 }
 
-void updateNeighbours(struct point * ps)
+//returns cheapest neighbour
+struct point * updateNeighbours(struct point * ps)
 {
+	int cheapest = INF;
+	struct point * cheapptr = NULL;
 	for(int i=0; !!ps->edges[i].e && i < NODE_EDGE_COUNT; i++)
 	{
 		if ((ps->edges[i].e->flag == NOT_VISITED || ps->edges[i].e->flag == TARGET) && ps->edges[i].e->z > (ps->edges[i].cost + ps->z)) {
-			ps->edges[i].e->z = (ps->edges[i].cost + ps->z);						
+			ps->edges[i].e->z = (ps->edges[i].cost + ps->z);
+			
+			if (cheapest > ps->edges[i].cost + ps->z) {
+				cheapest = ps->edges[i].cost + ps->z;
+				cheapptr = ps->edges[i].e; 
+			}
 		}
-	}	
+	}
+	return cheapptr;
 }
 
 struct point * cheapestVisitedNeighbor(struct point * ps)
@@ -220,11 +228,15 @@ int pf(struct point * ps, int cnt, int dim)
     int safeSwitch = 10;
     for (;;)
     {
-		pptr1 = cheapestNotVisitedNeighbor(pptr0);
+		//pptr1 = cheapestNotVisitedNeighbor(pptr0);
 		
-		struct point * i = cheapestNode(&ps, dim);
-		cheapestVisitedNeighbor(i);
-		printf("cheapest node %p, z: %d \n", i, i->z);
+		struct point * cheapest = cheapestNode(&ps, dim);
+		struct point * parent = cheapestVisitedNeighbor(cheapest);
+		cheapest->parent = parent; // reparent to chepest
+		updateNeighbours(cheapest);
+		cheapest->flag = VISITED;
+		
+		printf("cheapest node %p, z: %d \n", cheapest, cheapest->z);
 
         /*int cheapest = INT_MAX, cind = -1;
         for (int i = 0; i < cnt; i++)
