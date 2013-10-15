@@ -122,7 +122,7 @@ int setupNeighbors(struct point * ps, int cnt, int dim)
 {
     for(int i=0; i < cnt; i++) {
         for (int j=0; j < NODE_EDGE_COUNT; j++)
-            ps[i].edges[j].flag = 1;
+            ps[i].edges[j].flag = 1; //not used, e == null
     }
 	int frac, intp;
 	for(int i=0; i < cnt; i++) {
@@ -162,7 +162,6 @@ struct point * cheapestVisitedNeighbor(struct point * ps)
 		{
 			cheapest = ps->edges[i].e->z;
 			cheapptr = ps->edges[i].e;
-			cheapptr->parent = ps;			
 		}
 	}
 	return cheapptr;
@@ -207,14 +206,15 @@ struct point * rollbackToParent(struct point * p)
 struct point * cheapestNode(struct point ** arr, int dim)
 {
 	int cheapest = INF;
-
+	printf("Enter cheapest node\n");
 	int x = 0, y = 0, ind = -1;
 	for (x=0; x < dim; x++)
 		for (y=0; y < dim; y++) 
-			if ((*arr)[x*dim+y].flag == NOT_VISITED && (*arr)[x*dim+y].z < cheapest)
-				cheapest = (*arr)[x*dim+y].z, ind = x*dim+y;
-
-	return &(*arr)[ind];
+			if (((*arr)[x*dim+y].flag == NOT_VISITED || (*arr)[x*dim+y].flag == TARGET) && (*arr)[x*dim+y].z < cheapest)
+				{ printf("!!!%c\n", (*arr)[x*dim+y].flag);
+					cheapest = (*arr)[x*dim+y].z, ind = x*dim+y;}
+			else printf("flag %c z %d \n", (*arr)[x*dim+y].flag, (*arr)[x*dim+y].z);
+	return (ind == -1) ? NULL : &(*arr)[ind];
 }
 
 int pf(struct point * ps, int cnt, int dim)
@@ -224,6 +224,7 @@ int pf(struct point * ps, int cnt, int dim)
     setupNeighbors(ps,cnt, dim);
     
     struct point * pptr1, * parent, * pptr0 = &ps[startIndex];
+    updateNeighbours(pptr0);
     
     int safeSwitch = 10;
     for (;;)
@@ -231,44 +232,16 @@ int pf(struct point * ps, int cnt, int dim)
 		//pptr1 = cheapestNotVisitedNeighbor(pptr0);
 		
 		struct point * cheapest = cheapestNode(&ps, dim);
+		//printf("cheapest node %p, z: %d flag: %c \n", cheapest, cheapest->z, cheapest->flag);
+//		assert(cheapest->flag == 'o');
+		if (cheapest == NULL) { printf("no cheapest find, breakng loop"); break; }
+		else if (cheapest->flag == TARGET) printf("target found\n");
 		struct point * parent = cheapestVisitedNeighbor(cheapest);
 		cheapest->parent = parent; // reparent to chepest
+		printf("reparenting\n");
 		updateNeighbours(cheapest);
+		
 		cheapest->flag = VISITED;
-		
-		printf("cheapest node %p, z: %d \n", cheapest, cheapest->z);
-
-        /*int cheapest = INT_MAX, cind = -1;
-        for (int i = 0; i < cnt; i++)
-        {
-            if (ps[i].z < cheapest && ps[i].flag != HOME) { cheapest = ps[i].z; cind = i; }
-        }
-        pptr1 = &ps[cind];
-        pptr1->parent = pptr0;*/
-        
-		pptr0->flag = VISITED;
-		
-		if (pptr1 != NULL) {			
-			if(pptr1->flag == TARGET) {
-				printf("TARGET FOUND with cost: %d\n", pptr1->z);
-				break;
-			}
-			//printf("iter, %d, %d, ", pptr0->x, pptr0->y); printf("-> %d, %d\n", pptr1->x, pptr1->y);		
-			parent = pptr0;
-			pptr0 = pptr1;
-		} else {
-			//rollback to parent node if no solution			
-			//parent->flag = NOT_VISITED;
-			//pptr0 = parent;
-			
-			pptr0 = rollbackToParent(pptr0);
-			printf("rollback to %d, %d\n", pptr0->x, pptr0->y);
-			assert(pptr0->parent);
-			
-			/*int i;
-			for (int i=0; i < NODE_EDGE_COUNT && pptr0->edges[i].e && pptr0->edges[i].e->flag == VISITED; i++); 
-			if (i == NODE_EDGE_COUNT) { printf("all visited in node!\n" ); assert(0); }*/
-		}
 	}
     //int ind = getInd(ps,pptr0, INT_MAX);
     //printf("cheapest not visited neighbor ind:%d\n", ind);
