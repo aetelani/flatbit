@@ -5,7 +5,7 @@ Simple NoSQL DB that supports direct file access through indexing, data is hoste
 
 Licensed under GPLv2, contact information aetelani at live com.
 
-See the wiki for more information and development ideas. Project is in incubation phase, continued at somepoint. 
+See the wiki for more information and development ideas. Project is in incubation phase, continued at some point. 
 https://github.com/aetelani/flatbit/wiki
 
 
